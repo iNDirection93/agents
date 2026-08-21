@@ -53,9 +53,15 @@ done
 - [ ] Same for `tod`, `bart`
 - [ ] `bd list --label drnick --status open` runs (beads is already installed for the other agents)
 
-**Check the model IDs.** The new configs use `claude-opus-4.8` (Tod, recon, sim, Dr. Nick, Bart) and
-`claude-sonnet-4.6` (terminator), matching the existing agents. If your deployment pins different
-identifiers, change them in the JSON — nothing else depends on the value.
+**Check the model IDs.** Allocation and reasoning are in
+[`MODELS.md`](MODELS.md) — three Opus seats, five Sol, three Sonnet. One of those strings is a guess:
+
+> `gpt-5.6-sol` is inferred from the naming convention, **not confirmed against the deployment.**
+> Confirm it once against whatever your Kiro install accepts, and correct the five JSONs if it
+> differs.
+
+Model IDs live only in `.kiro/agents/*.json`; no prompt, skill, or script reads them, so a wrong
+string is a one-line fix per file and breaks nothing else.
 
 > `frink.json` references `skill://~/.kiro/skills/visual-explainer/SKILL.md`, a *user-level* skill
 > outside this repo. Pre-existing, unrelated to any of this, and harmless if absent.

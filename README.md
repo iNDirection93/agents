@@ -28,6 +28,11 @@ profiles, and both compromises show up as bad work.
 **todbots** — `recon`, `sim`, `terminator` — are not in this table because they are not states. They
 are Tod's workers, and they run in tmux windows rather than as Kiro sub-agents.
 
+**Models** are allocated on two axes — how hard the problem is, and how much context it needs — which
+lands the roster on three Opus seats, five Sol and three Sonnet. The three Opus seats turn out to be
+exactly the three agents that hold a long conversation with a person; everything else reads one thing
+and decides, which is what the one-task rule buys you. See [`.kiro/docs/MODELS.md`](.kiro/docs/MODELS.md).
+
 ```
 .kiro/docs/agent-graph.mermaid    the state machine — who runs after whom, and on which emit
 .kiro/docs/tod-mission.mermaid    Tod's delegation tree — deliberately a different shape
@@ -113,7 +118,7 @@ rewriting a doc to match code that ignored a decision is how a system forgets it
     todbot-pipeline/ glab + the push policy
     commit/, claims-table/, frink-design-doc/, scaffold-*/, point-site-to-branch/
   ci/              drift.gitlab-ci.yml — the staleness gate
-  docs/            WIRING.md (setup) + the graphs
+  docs/            WIRING.md (setup), MODELS.md (allocation) + the graphs
   mcp/nedops/      the dev-session MCP server (Go)
   corpus/          Comic Book Guy's pattern corpus
   todbots.config.sh   todbot knobs; override in todbots.config.local.sh (gitignored)

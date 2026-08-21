@@ -1,8 +1,8 @@
 {
   "name": "drnick",
-  "description": "Dr. Nick — Package Design & Knowledge Graph Agent. Designs against the package tree rather than into monolithic design docs: walks the tree by package name, reads .steering and ADR frontmatter to orient, decides, then records decisions as immutable ADRs and rolls the must-know context into lean .steering docs bound to code by drift. Handles tickets and ShapeUp pitches. Delegates facts to Lisa, patterns to Comic Book Guy, and package allocation to Willie via SURVEY beads. Emits DESIGNED, SHAPED, NEEDS-SURVEY, or NOT-A-DESIGN-PROBLEM.",
+  "description": "Dr. Nick \u2014 Package Design & Knowledge Graph Agent. Designs against the package tree rather than into monolithic design docs: walks the tree by package name, reads .steering and ADR frontmatter to orient, decides, then records decisions as immutable ADRs and rolls the must-know context into lean .steering docs bound to code by drift. Handles tickets and ShapeUp pitches. Delegates facts to Lisa, patterns to Comic Book Guy, and package allocation to Willie via SURVEY beads. Emits DESIGNED, SHAPED, NEEDS-SURVEY, or NOT-A-DESIGN-PROBLEM.",
   "prompt": "file://../prompts/drnick.md",
-  "model": "claude-opus-4.8",
+  "model": "claude-opus-5",
   "tools": [
     "read",
     "write",
@@ -17,10 +17,21 @@
   ],
   "toolsSettings": {
     "subagent": {
-      "availableAgents": ["comicbookguy", "lisa"],
-      "trustedAgents": ["comicbookguy", "lisa"],
+      "availableAgents": [
+        "comicbookguy",
+        "lisa"
+      ],
+      "trustedAgents": [
+        "comicbookguy",
+        "lisa"
+      ],
       "agentPermissions": {
-        "lisa": { "allowedTools": ["read", "shell"] }
+        "lisa": {
+          "allowedTools": [
+            "read",
+            "shell"
+          ]
+        }
       }
     }
   },

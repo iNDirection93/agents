@@ -2,7 +2,7 @@
   "name": "lisa",
   "description": "Lisa Simpson \u2014 read-only code investigation specialist. Spawned by planning agents (Willie, Frink) to research codebase questions in parallel without bloating the parent's context. Returns canonical structured summaries with path:line citations and honest confidence ratings.",
   "prompt": "file://../prompts/lisa.md",
-  "model": "claude-sonnet-4.6",
+  "model": "claude-sonnet-5",
   "tools": [
     "read",
     "shell"

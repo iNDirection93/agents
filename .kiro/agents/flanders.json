@@ -2,7 +2,7 @@
   "name": "flanders",
   "description": "Flanders \u2014 Development pairing buddy with live testing. Can work freeform or execute Willie's bead-based PR plans. Reads a package's .steering docs on entry, records decisions and commit SHAs in close reasons for the harvest, and hands unexplained bugs to Tod.",
   "prompt": "file://../prompts/flanders.md",
-  "model": "claude-opus-4.8",
+  "model": "claude-sonnet-5",
   "tools": [
     "read",
     "write",

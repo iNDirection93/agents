@@ -1,8 +1,8 @@
 {
   "name": "terminator-todbot",
-  "description": "terminator-todbot — makes the sim-todbot's failing test pass without modifying the test. Fixes the defect at the root cause named in the reproduction guide, keeps the diff small, runs the suite, and commits with the ticket prefix. Escalates TEST-WRONG or FIX-EXCEEDS-SCOPE to Tod rather than redesigning. Launched by Tod in a tmux window, not as a sub-agent.",
+  "description": "terminator-todbot \u2014 makes the sim-todbot's failing test pass without modifying the test. Fixes the defect at the root cause named in the reproduction guide, keeps the diff small, runs the suite, and commits with the ticket prefix. Escalates TEST-WRONG or FIX-EXCEEDS-SCOPE to Tod rather than redesigning. Launched by Tod in a tmux window, not as a sub-agent.",
   "prompt": "file://../prompts/todbots/terminator-todbot.md",
-  "model": "claude-sonnet-4.6",
+  "model": "claude-sonnet-5",
   "tools": [
     "read",
     "write",

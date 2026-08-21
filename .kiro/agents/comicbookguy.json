@@ -1,0 +1,14 @@
+{
+  "name": "comicbookguy",
+  "description": "Comic Book Guy — pattern oracle for software architecture. Given a contract, an anchor primitive, and an unfulfilled gap, returns 1–3 ranked candidate patterns with their properties, sketch, and misuse flags. Reads the corpus at .kiro/corpus/patterns.md. Stateless; safe to fan out in parallel across multiple gaps.",
+  "prompt": "file://../prompts/comicbookguy.md",
+  "model": "claude-opus-4.6",
+  "tools": [
+    "read",
+    "shell"
+  ],
+  "allowedTools": [
+    "read",
+    "shell"
+  ]
+}

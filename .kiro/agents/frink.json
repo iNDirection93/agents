@@ -1,0 +1,30 @@
+{
+  "name": "frink",
+  "description": "Frink — Design & Architecture Thinking Agent.",
+  "prompt": "file://../prompts/frink.md",
+  "model": "claude-opus-4.8",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "subagent"
+  ],
+  "allowedTools": [
+    "read",
+    "write",
+    "shell",
+    "subagent"
+  ],
+  "toolsSettings": {
+    "subagent": {
+      "availableAgents": ["comicbookguy", "lisa"],
+      "trustedAgents": ["comicbookguy", "lisa"]
+    }
+  },
+  "resources": [
+    "file://.kiro/steering/**/*.md",
+    "skill://~/.kiro/skills/visual-explainer/SKILL.md",
+    "skill://.kiro/skills/frink-design-doc/SKILL.md",
+    "skill://.kiro/skills/claims-table/SKILL.md"
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "skill_name": "claims-table",
+  "evals": [
+    {
+      "id": 1,
+      "name": "explicit-claims-table-request",
+      "prompt": "Extract the claims table from design/agent-registry.md.",
+      "expected_output": "Skill triggers; locates Acceptance Criteria section; runs extract.py; emits design/.claims/agent-registry.claims.json and .claims.md; runs coverage.py and reports counts.",
+      "should_trigger": true,
+      "files": ["design/agent-registry.md"]
+    },
+    {
+      "id": 2,
+      "name": "acceptance-criteria-synonym",
+      "prompt": "Pull the acceptance criteria out of this design doc into something I can hand to the test team.",
+      "expected_output": "Skill triggers on 'acceptance criteria' phrasing. Default output is the markdown rendering (claims.md); if user mentions Cucumber/SpecFlow downstream, offers Gherkin scaffold.",
+      "should_trigger": true,
+      "files": ["design/some-doc.md"]
+    },
+    {
+      "id": 3,
+      "name": "verification-matrix-synonym",
+      "prompt": "I need a verification matrix for the dispatcher design.",
+      "expected_output": "Skill triggers on 'verification matrix' synonym. Locates dispatcher design doc, extracts AC section into structured table.",
+      "should_trigger": true,
+      "files": ["design/dispatcher.md"]
+    },
+    {
+      "id": 4,
+      "name": "test-plan-from-spec",
+      "prompt": "What's the test plan implied by design/auth.md? I want it as a checklist.",
+      "expected_output": "Skill triggers (test plan from spec is in scope). Emits claims.md as the checklist. Notes that the skill produces the worklist but doesn't write the tests themselves.",
+      "should_trigger": true,
+      "files": ["design/auth.md"]
+    },
+    {
+      "id": 5,
+      "name": "what-would-i-test",
+      "prompt": "Looking at design/queue.md — what would I actually need to test?",
+      "expected_output": "Skill triggers despite implicit phrasing. Extracts AC section as the answer. If no AC section, surfaces that and offers to extract from prose with lower-confidence defaults.",
+      "should_trigger": true,
+      "files": ["design/queue.md"]
+    },
+    {
+      "id": 6,
+      "name": "doc-without-AC-section",
+      "prompt": "Generate a claims table from this design doc.",
+      "expected_output": "Skill triggers; reads doc; finds no Acceptance Criteria section; stops and offers two paths: (a) user adds the section (frink-design-doc skill) or (b) extracts from prose with all-assumed confidence and explicit caveat.",
+      "should_trigger": true,
+      "files": ["design/sketch.md"]
+    },
+    {
+      "id": 7,
+      "name": "with-gherkin-opt-in",
+      "prompt": "Extract claims from design/payments.md and also generate Gherkin since we use Cucumber.",
+      "expected_output": "Skill triggers; runs extract.py; runs render.py with --gherkin flag; emits .claims.json, .claims.md, and .feature files.",
+      "should_trigger": true,
+      "files": ["design/payments.md"]
+    },
+    {
+      "id": 8,
+      "name": "casual-phrasing",
+      "prompt": "ok now break down the AC into a table",
+      "expected_output": "Skill triggers; 'AC' is recognized as acceptance criteria; default rendering applied.",
+      "should_trigger": true,
+      "files": ["design/some-doc.md"]
+    },
+    {
+      "id": 9,
+      "name": "write-tests-NOT-claims-table",
+      "prompt": "Write the tests for the agent registry.",
+      "expected_output": "Skill does NOT trigger. Writing tests is downstream of the claims table; out of scope for this skill.",
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "write-step-defs-NOT-claims-table",
+      "prompt": "Implement the Cucumber step definitions for these scenarios.",
+      "expected_output": "Skill does NOT trigger. Step definitions are test code; this skill produces the scaffold .feature, not the bindings.",
+      "should_trigger": false,
+      "files": ["tests/features/registry.feature"]
+    },
+    {
+      "id": 11,
+      "name": "design-doc-authoring-NOT-extraction",
+      "prompt": "Write up the design doc for the auth service.",
+      "expected_output": "Skill does NOT trigger. That's the frink-design-doc skill's job. Authoring a doc and extracting from it are different workflows.",
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": 12,
+      "name": "general-testing-strategy-NOT-extraction",
+      "prompt": "How should I think about testing distributed systems generally?",
+      "expected_output": "Skill does NOT trigger. Generic testing-strategy advice doesn't have a design doc to extract from; not this skill's domain.",
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": 13,
+      "name": "modify-source-doc-NOT-extraction",
+      "prompt": "Update design/registry.md to add a new acceptance criterion.",
+      "expected_output": "Skill does NOT trigger. Modifying the source doc is upstream of this skill — refer the user to the frink-design-doc skill for amendment.",
+      "should_trigger": false,
+      "files": ["design/registry.md"]
+    },
+    {
+      "id": 14,
+      "name": "claims-from-readme-NOT-design-doc",
+      "prompt": "Generate test cases from the README.",
+      "expected_output": "Skill does NOT trigger. README is not a design doc with structured acceptance criteria; this would just be guessing at requirements from prose. Defer.",
+      "should_trigger": false,
+      "files": ["README.md"]
+    },
+    {
+      "id": 15,
+      "name": "stale-anchors-flagged",
+      "prompt": "Re-extract claims from design/registry.md and check if anything is stale.",
+      "expected_output": "Skill triggers; runs extract.py with --resolve-anchors; runs coverage.py; reports any stale Drift or test anchors. Doesn't auto-fix.",
+      "should_trigger": true,
+      "files": ["design/registry.md"]
+    },
+    {
+      "id": 16,
+      "name": "promote-confidence",
+      "prompt": "I just landed the tests for the dispatcher design — bump the relevant confidences.",
+      "expected_output": "Skill triggers; re-runs extract.py with --resolve-anchors --apply-rubric on the dispatcher doc. Newly-resolving test_anchors trigger 'asserted' → 'tested' suggestions for confirmation.",
+      "should_trigger": true,
+      "files": ["design/dispatcher.md"]
+    }
+  ]
+}

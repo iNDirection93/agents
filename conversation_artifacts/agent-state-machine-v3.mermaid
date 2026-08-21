@@ -1,0 +1,69 @@
+---
+title: State machine v3 — 9 states, 4 entry paths, one task per agent
+---
+flowchart LR
+    FEAT(["Feature · ticket"]):::entry
+    BETREQ(["Bet / pitch request"]):::entry
+    SIG(["Bug · incident · signal"]):::entry
+
+    FRINK["<b>Frink</b><br/><i>design</i>"]
+    MARTIN["<b>Martin</b><br/><i>specify</i>"]
+    TROY["<b>Troy</b><br/><i>pitch</i>"]
+    MARGE["<b>Marge</b><br/><i>work breakdown</i>"]
+    WILLIE["<b>Willie</b><br/><i>plan</i>"]
+    TOD["<b>Tod</b><br/><i>reproduce · instrument</i>"]
+    FLANDERS["<b>Flanders</b><br/><i>build · fix</i>"]
+    CHALMERS["<b>Chalmers</b><br/><i>integrate · audit · harvest</i>"]
+    SNYDER["<b>Snyder</b><br/><i>adjudicate MR feedback</i>"]
+
+    TABLE{"Betting table<br/>human decides"}:::gate
+    MR{"Merge request"}:::gate
+    MERGED(["Merged"]):::terminal
+    BACKLOG(["Backlog"]):::terminal
+    CLOSED(["Closed"]):::terminal
+
+    FEAT --> FRINK
+    BETREQ --> FRINK
+    SIG --> TOD
+
+    FRINK -->|"DESIGNED"| MARTIN
+    FRINK -->|"SHAPED"| TROY
+    FRINK -->|"NOT-A-DESIGN-PROBLEM"| WILLIE
+
+    MARTIN -->|"SPECIFIED"| WILLIE
+    MARTIN -->|"TRACE-INCOHERENT"| FRINK
+
+    TROY -->|"PITCHED"| TABLE
+    TABLE -->|"bet placed"| MARGE
+    TABLE -->|"not this cycle"| BACKLOG
+
+    MARGE -->|"TICKETS · one per ticket"| WILLIE
+    MARGE -->|"PITCH-INCOHERENT"| TROY
+
+    WILLIE -->|"PLANNED · one session per bead"| FLANDERS
+    WILLIE -->|"DESIGN-SMELL"| FRINK
+
+    TOD -->|"REPRODUCED"| FLANDERS
+    TOD -->|"DESIGN-DEFECT"| FRINK
+    TOD -->|"DEFER"| BACKLOG
+    TOD -->|"NO-REPRO"| CLOSED
+
+    FLANDERS -->|"BEAD-DONE"| CHALMERS
+    FLANDERS -->|"BEAD-WRONG"| WILLIE
+    FLANDERS -->|"REPRO-INSUFFICIENT"| TOD
+    FLANDERS -->|"DESIGN-DEFECT"| FRINK
+
+    CHALMERS -->|"HARVESTED"| MR
+    CHALMERS -->|"SEAMS-FAIL"| FLANDERS
+
+    MR -->|"approved"| MERGED
+    MR -->|"review comments"| SNYDER
+
+    SNYDER -->|"UPHELD-SIMPLE"| FLANDERS
+    SNYDER -->|"UPHELD-COMPLEX"| WILLIE
+    SNYDER -->|"ALL-OVERRULED · respond"| MR
+    SNYDER -->|"DESIGN-DEFECT"| FRINK
+
+    classDef entry fill:#e3f0ff,stroke:#2563eb,stroke-width:2px,color:#000
+    classDef terminal fill:#f1f3f5,stroke:#868e96,stroke-width:2px,color:#000
+    classDef gate fill:#fff4d6,stroke:#c98a00,stroke-width:3px,color:#000

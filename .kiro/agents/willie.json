@@ -1,0 +1,42 @@
+{
+  "name": "willie",
+  "description": "Willie — PR Planning Agent.",
+  "prompt": "file://../prompts/willie.md",
+  "model": "claude-opus-4.8",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "subagent",
+    "@willie-audit"
+  ],
+  "allowedTools": [
+    "read",
+    "write",
+    "shell",
+    "subagent",
+    "@willie-audit"
+  ],
+  "toolsSettings": {
+    "subagent": {
+      "availableAgents": ["lisa"],
+      "trustedAgents": ["lisa"],
+      "agentPermissions": {
+        "lisa": {
+          "allowedTools": ["read", "shell"]
+        }
+      }
+    }
+  },
+  "mcpServers": {
+    "willie-audit": {
+      "command": ".kiro/bin/willie-audit-mcp",
+      "env": {
+        "WORKSPACE_ROOT": "."
+      }
+    }
+  },
+  "resources": [
+    "file://.kiro/steering/**/*.md"
+  ]
+}

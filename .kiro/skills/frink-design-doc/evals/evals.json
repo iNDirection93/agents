@@ -1,0 +1,133 @@
+{
+  "skill_name": "frink-design-doc",
+  "evals": [
+    {
+      "id": 1,
+      "name": "explicit-design-doc-request",
+      "prompt": "Great, that's the design — can you write it up as a design doc in design/?",
+      "expected_output": "Skill triggers; phase 1 captures the reasoning into a structured intermediate; user is asked to confirm template choice (minimal vs full); draft follows the chosen template with EARS-form Acceptance Criteria and Drift anchors on load-bearing code blocks.",
+      "should_trigger": true,
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "implicit-design-doc-request",
+      "prompt": "OK I think we've covered everything — let's commit this so future me doesn't have to rederive it.",
+      "expected_output": "Skill triggers despite no explicit 'design doc' phrase; recognizes 'commit this' + 'future me' as a request to durably document the architectural conversation. Asks user where to write (default design/<name>.md).",
+      "should_trigger": true,
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "rfd-style-request",
+      "prompt": "Can you draft an RFD for the agent registry redesign? Treat it as load-bearing — it's going through public review.",
+      "expected_output": "Skill triggers; selects design-doc-full.md template (RFD framing + 'load-bearing' + 'public review' all signal full template); produces a long-form doc with cross-cutting concerns sections.",
+      "should_trigger": true,
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "adr-only-request",
+      "prompt": "We just need to record the decision to switch from RabbitMQ to NATS — no need for a full design doc.",
+      "expected_output": "Skill triggers; selects adr-block.md template; emits a single ADR file (path: design/adr/NNNN-rabbitmq-to-nats.md); skips Acceptance Criteria check (not applicable to ADRs).",
+      "should_trigger": true,
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "brownfield-with-existing-tangle",
+      "prompt": "Now write up the design. Remember that today's web/handlers.py:142 has the validation, dispatch, and audit logic all jammed together — the design needs to flag what to extract.",
+      "expected_output": "Skill triggers; produces doc with explicit Brownfield Notes section naming web/handlers.py:142 and the three responsibilities to disentangle; Drift anchors point at *target* paths (where the extracted components will live), not current paths.",
+      "should_trigger": true,
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "user-asks-to-update-existing-doc",
+      "prompt": "Update design/agent-registry.md to reflect the new lifecycle decision.",
+      "expected_output": "Skill triggers but pauses to ask: amend the existing doc (which is a different workflow than fresh authoring) or supersede with a new version? Does not silently overwrite.",
+      "should_trigger": true,
+      "files": ["design/agent-registry.md"]
+    },
+    {
+      "id": 7,
+      "name": "no-prior-reasoning-in-conversation",
+      "prompt": "Hey, can you write me a design doc for an authentication service?",
+      "expected_output": "Skill triggers but recognizes there's no prior architectural reasoning in the conversation. Pushes back: 'There's no design conversation to translate yet — let's get the contract and components nailed down first (probably worth involving the design agent), then I can write it up.' Does not invent architecture.",
+      "should_trigger": true,
+      "files": []
+    },
+    {
+      "id": 8,
+      "name": "casual-phrasing",
+      "prompt": "yeah lol just put that in design/",
+      "expected_output": "Skill triggers; casual register doesn't change the workflow. Asks for component name if not obvious from context, defaults to minimal template, drafts.",
+      "should_trigger": true,
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "readme-request-NOT-design-doc",
+      "prompt": "Write a README for this repo.",
+      "expected_output": "Skill does NOT trigger. README is user-facing documentation about how to use a project, not a design doc capturing architectural reasoning.",
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "api-docs-request-NOT-design-doc",
+      "prompt": "Generate API documentation for these endpoints.",
+      "expected_output": "Skill does NOT trigger. API reference docs describe an existing implementation; not the same as a design doc that prescribes what should exist.",
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": 11,
+      "name": "code-summary-NOT-design-doc",
+      "prompt": "Can you summarize what this code does?",
+      "expected_output": "Skill does NOT trigger. Summary of existing code is not architectural reasoning being captured into a design doc.",
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": 12,
+      "name": "pr-description-NOT-design-doc",
+      "prompt": "Write a PR description for these changes.",
+      "expected_output": "Skill does NOT trigger. PR descriptions are short-form explanations of a diff; design docs are long-form prescriptions of a target system.",
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": 13,
+      "name": "do-the-architecture-NOT-write-it-up",
+      "prompt": "Design a payment system for me.",
+      "expected_output": "Skill does NOT trigger. This is a request for architectural reasoning, not for translation of existing reasoning. Frink (or another design agent) should engage; the skill kicks in only after the reasoning exists.",
+      "should_trigger": false,
+      "files": []
+    },
+    {
+      "id": 14,
+      "name": "tech-spec-synonym",
+      "prompt": "Let's get this into a tech spec we can share with the team.",
+      "expected_output": "Skill triggers. 'Tech spec' is a synonym for design doc; the workflow is the same.",
+      "should_trigger": true,
+      "files": []
+    },
+    {
+      "id": 15,
+      "name": "review-existing-doc-NOT-author",
+      "prompt": "Review this design doc and tell me what's missing.",
+      "expected_output": "Skill does NOT trigger. Review is a different workflow — the user wants critique, not authorship.",
+      "should_trigger": false,
+      "files": ["design/some-existing-doc.md"]
+    },
+    {
+      "id": 16,
+      "name": "extract-claims-NOT-author-doc",
+      "prompt": "Extract the acceptance criteria from this design doc into a claims table.",
+      "expected_output": "Skill does NOT trigger. Claims extraction is the claims-table skill's job. This skill authors docs, doesn't decompose them.",
+      "should_trigger": false,
+      "files": ["design/some-existing-doc.md"]
+    }
+  ]
+}

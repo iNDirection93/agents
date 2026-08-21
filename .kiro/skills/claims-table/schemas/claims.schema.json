@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/claims.schema.json",
+  "title": "Claims Table",
+  "description": "Structured acceptance criteria extracted from a design document. Produced by the claims-table skill.",
+  "type": "object",
+  "required": ["component_name", "doc_path", "generated_at", "claims"],
+  "additionalProperties": false,
+  "properties": {
+    "component_name": {
+      "type": "string",
+      "description": "Name of the component this design doc describes. Taken from the doc's H1.",
+      "minLength": 1
+    },
+    "doc_path": {
+      "type": "string",
+      "description": "Path to the source design doc, relative to repo root.",
+      "pattern": "^[^/].*\\.md$"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when this claims.json was generated."
+    },
+    "doc_sha": {
+      "type": "string",
+      "description": "Git SHA of the design doc at extraction time, if available.",
+      "pattern": "^[0-9a-f]{7,40}$"
+    },
+    "summary": {
+      "type": "object",
+      "description": "Aggregate counts. Computed; the user shouldn't edit by hand.",
+      "additionalProperties": false,
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "by_kind": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "by_confidence": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "description": "Individual acceptance criteria. Order matches the source doc.",
+      "items": { "$ref": "#/$defs/claim" }
+    }
+  },
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "required": ["id", "claim", "kind", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^AC-\\d+$",
+          "description": "Stable identifier within this doc. Format: AC-<integer>."
+        },
+        "claim": {
+          "type": "string",
+          "description": "EARS-form claim text. One of the five canonical patterns plus their compositions.",
+          "minLength": 8
+        },
+        "ears_pattern": {
+          "type": "string",
+          "enum": ["ubiquitous", "event-driven", "state-driven", "optional-feature", "unwanted-behavior", "composed"],
+          "description": "Which EARS pattern the claim matches. Computed from claim text."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["precondition", "postcondition", "invariant", "perf", "security", "ux"],
+          "description": "Category. See references/claim-kinds.md."
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["verified", "tested", "asserted", "assumed", "speculative"],
+          "description": "Evidence level. See references/confidence-rubric.md."
+        },
+        "verification_evidence": {
+          "type": "string",
+          "description": "Optional pointer to evidence justifying the confidence (only meaningful for 'verified' or 'tested')."
+        },
+        "test_anchor": {
+          "type": "string",
+          "description": "Pointer to the test verifying this claim. Format: 'path/to/test.ext::name' (pytest) or 'path/to/test.ext#name' (other). Use 'pending' if not yet written.",
+          "pattern": "^(pending|[^\\s]+(::|#)[A-Za-z_][A-Za-z0-9_:]*)$"
+        },
+        "drift_anchor": {
+          "type": "string",
+          "description": "Pointer to the code symbol this claim depends on. Format: 'path/to/file.ext#Symbol'. Use 'pending' if not yet implemented.",
+          "pattern": "^(pending|[^\\s#]+#[A-Za-z_][A-Za-z0-9_]*)$"
+        },
+        "depends_on": {
+          "type": "array",
+          "description": "Other claim IDs this claim depends on (e.g., a postcondition that assumes a precondition).",
+          "items": { "type": "string", "pattern": "^AC-\\d+$" },
+          "uniqueItems": true
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Free-text note explaining the claim's origin, edge cases, or any context that didn't fit in the EARS form."
+        },
+        "owner": {
+          "type": "string",
+          "description": "Optional owner (person or agent) responsible for verifying this claim."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Optional free-form tags (e.g., 'launch-blocker', 'p0', 'post-launch').",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

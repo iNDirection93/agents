@@ -1,0 +1,46 @@
+{
+  "name": "flanders",
+  "description": "Flanders — Development pairing buddy with live testing. Can work freeform or execute Willie's bead-based PR plans.",
+  "prompt": "file://../prompts/flanders.md",
+  "model": "claude-opus-4.8",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "@nedops"
+  ],
+  "allowedTools": [
+    "read",
+    "write",
+    "shell",
+    "@nedops/services",
+    "@nedops/start",
+    "@nedops/stop",
+    "@nedops/restart",
+    "@nedops/status",
+    "@nedops/logs",
+    "@nedops/read_service_config",
+    "@nedops/http_request",
+    "@nedops/set_mock_response",
+    "@nedops/clear_mocks",
+    "@nedops/list_mocks",
+    "@nedops/get_jwt",
+    "@nedops/build_agent_run_request"
+  ],
+  "resources":
+  [
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/commit/SKILL.md",
+    "skill://.kiro/skills/point-site-to-branch/SKILL.md",
+    "skill://.kiro/skills/scaffold-tool-server/SKILL.md",
+    "skill://.kiro/skills/scaffold-integration-test/SKILL.md"
+  ],
+  "mcpServers": {
+    "nedops": {
+      "command": ".kiro/bin/nedops-mcp",
+      "env": {
+        "WORKSPACE_ROOT": "."
+      }
+    }
+  }
+}

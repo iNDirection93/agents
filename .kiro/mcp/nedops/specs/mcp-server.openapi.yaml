@@ -1,0 +1,179 @@
+openapi: 3.1.0
+info:
+  title: LCP MCP Server
+  # NOTE: This spec is maintained by AI (Flanders) during development.
+  # When the Go MCP server's HTTP API changes (routes, headers, request/response
+  # formats), Flanders updates this file to match. It drives the read_service_config()
+  # tool output used for endpoint discovery and live testing.
+  description: >
+    Go MCP server that proxies MCP JSON-RPC requests to the Java tools service.
+    Speaks MCP Streamable HTTP (JSON-RPC 2.0 over HTTP POST).
+  version: v1.3.0
+
+servers:
+  - url: http://localhost:8082
+
+paths:
+  /mcp/{agentUuid}:
+    post:
+      operationId: mcpRequest
+      summary: Send an MCP JSON-RPC request for a specific agent
+      description: >
+        Primary MCP endpoint. Accepts JSON-RPC 2.0 requests per the MCP
+        Streamable HTTP transport spec. The server fetches tool definitions
+        from the Java tools service on each request (stateless mode).
+        The agentUuid path parameter identifies the agent for tool discovery
+        and execution. Agent input variable values (base64-encoded JSON) can
+        be passed via the "inputs" query parameter to resolve Document and
+        Folder-type variables. This allows inputs to be baked into the URN.
+      parameters:
+        - $ref: '#/components/parameters/AgentUuid'
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/AcceptStreamableHTTP'
+        - $ref: '#/components/parameters/AgentInputsQuery'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonRpcRequest'
+            examples:
+              listTools:
+                summary: List available tools
+                value:
+                  jsonrpc: "2.0"
+                  method: tools/list
+                  id: 1
+              callTool:
+                summary: Call a tool
+                value:
+                  jsonrpc: "2.0"
+                  method: tools/call
+                  params:
+                    name: execute_rule_my_rule__a-00001
+                    arguments:
+                      reasoning: Testing the rule
+                      expressionRuleUuid: "_a-00001234-5678-9000-abcd-ef0123456789_1234"
+                      expressionRuleInputMap:
+                        param1: value1
+                  id: 2
+      responses:
+        '200':
+          description: JSON-RPC response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonRpcResponse'
+
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+
+components:
+  parameters:
+    AgentUuid:
+      name: agentUuid
+      in: path
+      required: true
+      description: UUID of the agent whose tools to discover and execute
+      schema:
+        type: string
+        format: uuid
+
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      description: Bearer token (JWT) for authenticating with the LCP API
+      schema:
+        type: string
+        example: "Bearer eyJhbGci..."
+
+    AcceptStreamableHTTP:
+      name: Accept
+      in: header
+      required: true
+      description: >
+        Must include both application/json and text/event-stream per the
+        MCP Streamable HTTP transport specification.
+      schema:
+        type: string
+        example: "application/json, text/event-stream"
+
+    AgentInputsQuery:
+      name: inputs
+      in: query
+      required: false
+      description: >
+        Same as X-Agent-Inputs header but as a query parameter. Allows inputs
+        to be baked into the URN so they flow through on tools/call without
+        the caller needing to set a custom header. Header takes precedence
+        if both are provided.
+      schema:
+        type: string
+        format: byte
+      example: 'eyJteURvY3VtZW50IjoiYWJjLTEyMy1kb2MtdXVpZCJ9'
+
+  schemas:
+    JsonRpcRequest:
+      type: object
+      required: [jsonrpc, method, id]
+      properties:
+        jsonrpc:
+          type: string
+          const: "2.0"
+        method:
+          type: string
+          description: "MCP method (e.g. tools/list, tools/call)"
+          enum:
+            - tools/list
+            - tools/call
+            - initialize
+            - ping
+        params:
+          type: object
+          description: Method-specific parameters
+          properties:
+            name:
+              type: string
+              description: Tool name (for tools/call)
+            arguments:
+              type: object
+              description: Tool arguments (for tools/call)
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+          description: Request identifier
+
+    JsonRpcResponse:
+      type: object
+      required: [jsonrpc, id]
+      properties:
+        jsonrpc:
+          type: string
+          const: "2.0"
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+        result:
+          type: object
+          description: Successful result (present on success)
+        error:
+          type: object
+          description: Error object (present on failure)
+          properties:
+            code:
+              type: integer
+            message:
+              type: string

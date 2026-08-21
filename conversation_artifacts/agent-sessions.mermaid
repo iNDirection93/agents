@@ -1,0 +1,123 @@
+---
+title: Session view — each box is one agent chat session; pills are its sub-agents
+---
+flowchart TB
+    FEAT(["Feature · ticket"]):::entry
+    BETREQ(["Bet · pitch request"]):::entry
+    SIG(["Bug · incident · signal"]):::entry
+
+    subgraph S_FRINK["SESSION · Frink"]
+        FRINK["<b>Frink</b> — design / shape<br/><i>Opus 5</i>"]
+        CBG(["Comic Book Guy ×1–4"]):::sub
+        LISA_F(["Lisa"]):::subopt
+        FRINK -.-> CBG
+        FRINK -.-> LISA_F
+    end
+
+    subgraph S_MARTIN["SESSION · Martin"]
+        MARTIN["<b>Martin</b> — specify<br/><i>Sol</i>"]
+        LISA_M(["Lisa · path:line only"]):::subopt
+        MARTIN -.-> LISA_M
+    end
+
+    subgraph S_TROY["SESSION · Troy"]
+        TROY["<b>Troy</b> — pitch<br/><i>Sol</i>"]
+        LISA_T(["Lisa"]):::subopt
+        TROY -.-> LISA_T
+    end
+
+    subgraph S_MARGE["SESSION · Marge"]
+        MARGE["<b>Marge</b> — work breakdown<br/><i>Sol</i> · no sub-agents"]
+    end
+
+    subgraph S_WILLIE["SESSION · Willie"]
+        WILLIE["<b>Willie</b> — plan<br/><i>Opus 5</i>"]
+        LISA_W(["Lisa ×N · enumerated upfront"]):::sub
+        WILLIE -.-> LISA_W
+    end
+
+    subgraph S_TOD["SESSION · Tod"]
+        TOD["<b>Tod</b> — reproduce · instrument<br/><i>Sol</i> · scoped write"]
+        LISA_TD(["Lisa"]):::sub
+        TOD -.-> LISA_TD
+    end
+
+    subgraph S_FLAND["SESSION · Flanders — one per bead"]
+        FLANDERS["<b>Flanders</b> — build / fix<br/><i>Sonnet 5, escalating</i><br/>runs NedOps · verifies · commits"]
+        EDNA(["Edna · failing test"]):::sub
+        ROD(["Rod · red → green → refactor"]):::sub
+        GRIMES(["Grimes · review"]):::sub
+        FLANDERS -.-> EDNA
+        FLANDERS -.-> ROD
+        FLANDERS -.->|"≤2 iterations"| GRIMES
+    end
+
+    subgraph S_CHALM["SESSION · Chalmers"]
+        CHALMERS["<b>Chalmers</b> — integrate · audit · harvest<br/><i>Sol</i>"]
+        LISA_C(["Lisa"]):::subopt
+        KENT(["Kent · log levels"]):::sub
+        SMITHERS(["Smithers · branch write"]):::sub
+        CHALMERS -.-> LISA_C
+        CHALMERS -.-> KENT
+        CHALMERS -.-> SMITHERS
+    end
+
+    subgraph S_SNYDER["SESSION · Snyder"]
+        SNYDER["<b>Snyder</b> — adjudicate MR feedback<br/><i>Sol</i>"]
+        LISA_S(["Lisa · verify the claim"]):::sub
+        SNYDER -.-> LISA_S
+    end
+
+    TABLE{"Betting table<br/>human decides"}:::gate
+    MR{"Merge request"}:::gate
+    MERGED(["Merged"]):::terminal
+    BACKLOG(["Backlog"]):::terminal
+    CLOSED(["Closed"]):::terminal
+
+    FEAT ==> FRINK
+    BETREQ ==> FRINK
+    SIG ==> TOD
+
+    FRINK ==>|"DESIGNED"| MARTIN
+    FRINK ==>|"SHAPED"| TROY
+    FRINK ==>|"NOT-A-DESIGN-PROBLEM"| WILLIE
+
+    MARTIN ==>|"SPECIFIED"| WILLIE
+    MARTIN ==>|"TRACE-INCOHERENT"| FRINK
+
+    TROY ==>|"PITCHED"| TABLE
+    TABLE ==>|"bet placed"| MARGE
+    TABLE ==>|"not this cycle"| BACKLOG
+
+    MARGE ==>|"TICKETS · one per ticket"| WILLIE
+    MARGE ==>|"PITCH-INCOHERENT"| TROY
+
+    WILLIE ==>|"PLANNED · one session per bead"| FLANDERS
+    WILLIE ==>|"DESIGN-SMELL"| FRINK
+
+    TOD ==>|"REPRODUCED"| FLANDERS
+    TOD ==>|"DESIGN-DEFECT"| FRINK
+    TOD ==>|"DEFER"| BACKLOG
+    TOD ==>|"NO-REPRO"| CLOSED
+
+    FLANDERS ==>|"BEAD-DONE"| CHALMERS
+    FLANDERS ==>|"BEAD-WRONG"| WILLIE
+    FLANDERS ==>|"REPRO-INSUFFICIENT"| TOD
+    FLANDERS ==>|"DESIGN-DEFECT"| FRINK
+
+    CHALMERS ==>|"HARVESTED"| MR
+    CHALMERS ==>|"SEAMS-FAIL"| FLANDERS
+
+    MR ==>|"approved"| MERGED
+    MR ==>|"review comments"| SNYDER
+
+    SNYDER ==>|"UPHELD-SIMPLE"| FLANDERS
+    SNYDER ==>|"UPHELD-COMPLEX"| WILLIE
+    SNYDER ==>|"ALL-OVERRULED · post rationale"| MR
+    SNYDER ==>|"DESIGN-DEFECT"| FRINK
+
+    classDef entry fill:#e3f0ff,stroke:#2563eb,stroke-width:2px,color:#000
+    classDef terminal fill:#f1f3f5,stroke:#868e96,stroke-width:2px,color:#000
+    classDef gate fill:#fff4d6,stroke:#c98a00,stroke-width:3px,color:#000
+    classDef sub fill:#eef2ff,stroke:#6366f1,stroke-width:1px,color:#000,font-size:11px
+    classDef subopt fill:#f8f9fa,stroke:#adb5bd,stroke-width:1px,stroke-dasharray:3 3,color:#000,font-size:11px

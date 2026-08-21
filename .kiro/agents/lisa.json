@@ -1,6 +1,6 @@
 {
   "name": "lisa",
-  "description": "Lisa Simpson — read-only code investigation specialist. Spawned by planning agents (Willie, Frink) to research codebase questions in parallel without bloating the parent's context. Returns canonical structured summaries with path:line citations and honest confidence ratings.",
+  "description": "Lisa Simpson \u2014 read-only code investigation specialist. Spawned by planning agents (Willie, Frink) to research codebase questions in parallel without bloating the parent's context. Returns canonical structured summaries with path:line citations and honest confidence ratings.",
   "prompt": "file://../prompts/lisa.md",
   "model": "claude-sonnet-4.6",
   "tools": [
@@ -12,6 +12,7 @@
     "shell"
   ],
   "resources": [
+    "file://.kiro/prompts/knowledge-graph-conventions.md",
     "file://.kiro/steering/**/*.md"
   ]
 }

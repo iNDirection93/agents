@@ -1,0 +1,27 @@
+{
+  "name": "tod",
+  "description": "Tod — Bug Elimination Orchestrator. Takes a bug signal, verifies the environment, then drives recon → sim → terminator → verify todbots in tmux windows, gating each transition on a durable artifact. Writes no source code, tests, or fixes himself. Emits exactly one exit: BUG-ELIMINATED, NO-REPRO, DESIGN-DEFECT, NEEDS-HUMAN, or DEFER.",
+  "prompt": "file://../prompts/tod.md",
+  "model": "claude-opus-4.8",
+  "tools": [
+    "read",
+    "write",
+    "shell"
+  ],
+  "allowedTools": [
+    "read",
+    "write",
+    "shell"
+  ],
+  "resources": [
+    "file://.kiro/prompts/bead-conventions.md",
+    "file://.kiro/prompts/knowledge-graph-conventions.md",
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/todbot-tmux/SKILL.md",
+    "skill://.kiro/skills/todbot-auth/SKILL.md",
+    "skill://.kiro/skills/todbot-observability/SKILL.md",
+    "skill://.kiro/skills/todbot-pipeline/SKILL.md",
+    "skill://.kiro/skills/point-site-to-branch/SKILL.md",
+    "skill://.kiro/skills/commit/SKILL.md"
+  ]
+}

@@ -1,0 +1,22 @@
+# Todbot mission working material. The repro guide is worth keeping — Tod copies
+# the one for a fixed bug into the commit; everything else here is scratch.
+.kiro/tod/*/
+!.kiro/tod/*/10-repro-guide.md
+
+# Credentials handed down from a Tod conversation. Never checked in.
+.env.auth
+.kiro/todbots.config.local.sh
+
+# Ephemeral implementation guides. Dr. Nick writes them, Willie consumes and
+# deletes them. If one of these is ever committed, something has gone wrong with
+# the workflow — a guide that outlives its ticket is a decoy.
+**/.design/guides/
+
+# Harvest reports are local working notes; the beads Bart files are the record.
+.kiro/harvest/
+
+# Built MCP binaries
+.kiro/bin/
+
+# OS noise
+.DS_Store

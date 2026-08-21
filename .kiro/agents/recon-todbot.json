@@ -1,7 +1,7 @@
 {
-  "name": "flanders",
-  "description": "Flanders \u2014 Development pairing buddy with live testing. Can work freeform or execute Willie's bead-based PR plans. Reads a package's .steering docs on entry, records decisions and commit SHAs in close reasons for the harvest, and hands unexplained bugs to Tod.",
-  "prompt": "file://../prompts/flanders.md",
+  "name": "recon-todbot",
+  "description": "recon-todbot — verifies a bug with its own eyes. Runs the failure against a branch deployment, adds observability until the defect has a path:line address, and writes a reproduction guide with a failure signature and an instrumentation ledger. Also runs a second time to verify the bug is gone and rate the instrumentation. Adds observability; never changes behaviour; never fixes anything. Launched by Tod in a tmux window, not as a sub-agent.",
+  "prompt": "file://../prompts/todbots/recon-todbot.md",
   "model": "claude-opus-4.8",
   "tools": [
     "read",
@@ -24,17 +24,13 @@
     "@nedops/set_mock_response",
     "@nedops/clear_mocks",
     "@nedops/list_mocks",
-    "@nedops/get_jwt",
-    "@nedops/build_agent_run_request"
+    "@nedops/get_jwt"
   ],
   "resources": [
-    "file://.kiro/prompts/bead-conventions.md",
     "file://.kiro/prompts/knowledge-graph-conventions.md",
     "file://.kiro/steering/**/*.md",
-    "skill://.kiro/skills/commit/SKILL.md",
-    "skill://.kiro/skills/point-site-to-branch/SKILL.md",
-    "skill://.kiro/skills/scaffold-tool-server/SKILL.md",
-    "skill://.kiro/skills/scaffold-integration-test/SKILL.md"
+    "skill://.kiro/skills/todbot-observability/SKILL.md",
+    "skill://.kiro/skills/todbot-auth/SKILL.md"
   ],
   "mcpServers": {
     "nedops": {

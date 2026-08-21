@@ -1,0 +1,41 @@
+{
+  "name": "terminator-todbot",
+  "description": "terminator-todbot — makes the sim-todbot's failing test pass without modifying the test. Fixes the defect at the root cause named in the reproduction guide, keeps the diff small, runs the suite, and commits with the ticket prefix. Escalates TEST-WRONG or FIX-EXCEEDS-SCOPE to Tod rather than redesigning. Launched by Tod in a tmux window, not as a sub-agent.",
+  "prompt": "file://../prompts/todbots/terminator-todbot.md",
+  "model": "claude-sonnet-4.6",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "@nedops"
+  ],
+  "allowedTools": [
+    "read",
+    "write",
+    "shell",
+    "@nedops/services",
+    "@nedops/start",
+    "@nedops/stop",
+    "@nedops/restart",
+    "@nedops/status",
+    "@nedops/logs",
+    "@nedops/read_service_config",
+    "@nedops/http_request",
+    "@nedops/set_mock_response",
+    "@nedops/clear_mocks",
+    "@nedops/list_mocks"
+  ],
+  "resources": [
+    "file://.kiro/prompts/knowledge-graph-conventions.md",
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/commit/SKILL.md"
+  ],
+  "mcpServers": {
+    "nedops": {
+      "command": ".kiro/bin/nedops-mcp",
+      "env": {
+        "WORKSPACE_ROOT": "."
+      }
+    }
+  }
+}

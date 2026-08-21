@@ -1,0 +1,43 @@
+{
+  "name": "recon-todbot",
+  "description": "recon-todbot \u2014 verifies a bug with its own eyes. Runs the failure against a branch deployment, adds observability until the defect has a path:line address, and writes a reproduction guide with a failure signature and an instrumentation ledger. Also runs a second time to verify the bug is gone and rate the instrumentation. Adds observability; never changes behaviour; never fixes anything. Launched by Tod in a tmux window, not as a sub-agent.",
+  "prompt": "file://../prompts/todbots/recon-todbot.md",
+  "model": "gpt-5.6-sol",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "@nedops"
+  ],
+  "allowedTools": [
+    "read",
+    "write",
+    "shell",
+    "@nedops/services",
+    "@nedops/start",
+    "@nedops/stop",
+    "@nedops/restart",
+    "@nedops/status",
+    "@nedops/logs",
+    "@nedops/read_service_config",
+    "@nedops/http_request",
+    "@nedops/set_mock_response",
+    "@nedops/clear_mocks",
+    "@nedops/list_mocks",
+    "@nedops/get_jwt"
+  ],
+  "resources": [
+    "file://.kiro/prompts/knowledge-graph-conventions.md",
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/todbot-observability/SKILL.md",
+    "skill://.kiro/skills/todbot-auth/SKILL.md"
+  ],
+  "mcpServers": {
+    "nedops": {
+      "command": ".kiro/bin/nedops-mcp",
+      "env": {
+        "WORKSPACE_ROOT": "."
+      }
+    }
+  }
+}

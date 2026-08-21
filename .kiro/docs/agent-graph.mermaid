@@ -1,0 +1,65 @@
+---
+title: Agent graph — states, exits, and the two new subgraphs
+---
+flowchart LR
+    %% ---------- entry points ----------
+    TICKET(["Ticket · feature"]):::entry
+    PITCHREQ(["Pitch request"]):::entry
+    SIG(["Bug · incident · signal"]):::entry
+
+    %% ---------- states ----------
+    DRNICK["<b>Dr. Nick</b><br/><i>package design</i><br/>.steering + ADRs"]
+    FRINK["<b>Frink</b><br/><i>legacy design</i><br/>design/*.md"]:::legacy
+    WILLIE["<b>Willie</b><br/><i>plan + allocate</i>"]
+    TOD["<b>Tod</b><br/><i>bug orchestration</i>"]
+    FLANDERS["<b>Flanders</b><br/><i>build · test live</i>"]
+    BART["<b>Bart</b><br/><i>harvest</i>"]
+
+    PITCH{{"docs/.pitches<br/>betting table"}}:::gate
+    MR{{"Merge request"}}:::gate
+    CLOSED(["Closed"]):::terminal
+    BACKLOG(["Backlog"]):::terminal
+
+    %% ---------- design path ----------
+    TICKET --> DRNICK
+    PITCHREQ --> DRNICK
+    TICKET -.-> WILLIE
+
+    DRNICK -->|"DESIGNED"| WILLIE
+    DRNICK -->|"NOT-A-DESIGN-PROBLEM"| WILLIE
+    DRNICK -->|"SHAPED"| PITCH
+    DRNICK -->|"NEEDS-SURVEY"| WILLIE
+    WILLIE -->|"SURVEYED"| DRNICK
+    PITCH -->|"bet placed"| WILLIE
+    PITCH -->|"not this cycle"| BACKLOG
+
+    WILLIE -->|"PLANNED · one session per bead"| FLANDERS
+    WILLIE -->|"DESIGN-SMELL"| DRNICK
+    WILLIE -.->|"legacy doc question"| FRINK
+    FRINK -.->|"DECOMPOSE"| WILLIE
+
+    %% ---------- build ----------
+    FLANDERS -->|"BEAD-DONE · all beads closed"| BART
+    FLANDERS -->|"BEAD-WRONG"| WILLIE
+    FLANDERS -->|"DESIGN-DEFECT"| DRNICK
+    FLANDERS -->|"NEEDS-REPRO · can't explain it"| TOD
+
+    %% ---------- bug path ----------
+    SIG --> TOD
+    TOD -->|"BUG-ELIMINATED"| BART
+    TOD -->|"NO-REPRO"| CLOSED
+    TOD -->|"DESIGN-DEFECT"| DRNICK
+    TOD -->|"DEFER"| BACKLOG
+    TOD -->|"cleanup bead"| FLANDERS
+
+    %% ---------- harvest ----------
+    BART -->|"HARVESTED"| MR
+    BART -->|"ADAPTED · docs stale"| DRNICK
+    BART -->|"ADR-NEEDED"| DRNICK
+    BART -->|"STEERING-MISSING"| DRNICK
+    BART -->|"DID-NOT-FOLLOW · code is wrong"| WILLIE
+
+    classDef entry fill:#e3f0ff,stroke:#2563eb,stroke-width:2px,color:#000
+    classDef terminal fill:#f1f3f5,stroke:#868e96,stroke-width:2px,color:#000
+    classDef gate fill:#fff4d6,stroke:#c98a00,stroke-width:3px,color:#000
+    classDef legacy fill:#f8f9fa,stroke:#adb5bd,stroke-dasharray:4 3,color:#000

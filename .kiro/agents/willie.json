@@ -1,8 +1,8 @@
 {
   "name": "willie",
-  "description": "Willie — PR Planning Agent.",
+  "description": "Willie \u2014 PR Planning Agent. Investigates before planning, decomposes into beads, and allocates every change to an owning package against the nesting rule. Consumes and deletes Dr. Nick's implementation guides; handles SURVEY beads and Bart's harvest corrections.",
   "prompt": "file://../prompts/willie.md",
-  "model": "claude-opus-4.8",
+  "model": "claude-opus-5",
   "tools": [
     "read",
     "write",
@@ -19,11 +19,18 @@
   ],
   "toolsSettings": {
     "subagent": {
-      "availableAgents": ["lisa"],
-      "trustedAgents": ["lisa"],
+      "availableAgents": [
+        "lisa"
+      ],
+      "trustedAgents": [
+        "lisa"
+      ],
       "agentPermissions": {
         "lisa": {
-          "allowedTools": ["read", "shell"]
+          "allowedTools": [
+            "read",
+            "shell"
+          ]
         }
       }
     }
@@ -37,6 +44,8 @@
     }
   },
   "resources": [
+    "file://.kiro/prompts/bead-conventions.md",
+    "file://.kiro/prompts/knowledge-graph-conventions.md",
     "file://.kiro/steering/**/*.md"
   ]
 }

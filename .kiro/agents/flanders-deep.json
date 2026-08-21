@@ -1,8 +1,8 @@
 {
-  "name": "flanders",
-  "description": "Flanders \u2014 Development pairing buddy with live testing. Can work freeform or execute Willie's bead-based PR plans. Reads a package's .steering docs on entry, records decisions and commit SHAs in close reasons for the harvest, and hands unexplained bugs to Tod.",
+  "name": "flanders-deep",
+  "description": "Flanders (deep) \u2014 identical to `flanders` in every way except the model. Open this instead when a bead carries the `model:opus` label, which Willie assigns at planning time from evidence he already has: a LOW-confidence Lisa return, a `risky` bead, a brownfield untangling, or a change crossing the Go/Java boundary. Same prompt, same tools, same exits \u2014 the config exists only because the model is pinned per agent config.",
   "prompt": "file://../prompts/flanders.md",
-  "model": "claude-sonnet-5",
+  "model": "claude-opus-5",
   "tools": [
     "read",
     "write",

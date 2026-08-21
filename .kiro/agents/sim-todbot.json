@@ -1,0 +1,43 @@
+{
+  "name": "sim-todbot",
+  "description": "sim-todbot \u2014 turns a reproduction guide into an automated test that should pass and fails, proving the bug. Biases hard toward a new case in an existing data-driven unit test; climbs to integration or pipeline runs only with justification. Applies an anti-naive-test rubric and a mandatory counterfactual clause. Writes tests only, never production code. Launched by Tod in a tmux window, not as a sub-agent.",
+  "prompt": "file://../prompts/todbots/sim-todbot.md",
+  "model": "gpt-5.6-sol",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "@nedops"
+  ],
+  "allowedTools": [
+    "read",
+    "write",
+    "shell",
+    "@nedops/services",
+    "@nedops/start",
+    "@nedops/stop",
+    "@nedops/restart",
+    "@nedops/status",
+    "@nedops/logs",
+    "@nedops/read_service_config",
+    "@nedops/http_request",
+    "@nedops/set_mock_response",
+    "@nedops/clear_mocks",
+    "@nedops/list_mocks"
+  ],
+  "resources": [
+    "file://.kiro/prompts/knowledge-graph-conventions.md",
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/scaffold-integration-test/SKILL.md",
+    "skill://.kiro/skills/todbot-pipeline/SKILL.md",
+    "skill://.kiro/skills/commit/SKILL.md"
+  ],
+  "mcpServers": {
+    "nedops": {
+      "command": ".kiro/bin/nedops-mcp",
+      "env": {
+        "WORKSPACE_ROOT": "."
+      }
+    }
+  }
+}

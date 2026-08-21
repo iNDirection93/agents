@@ -1,0 +1,53 @@
+# Drift — fail an MR whose code changes outran the steering docs that describe them.
+#
+# Include from the repo's .gitlab-ci.yml:
+#
+#   include:
+#     - local: '.kiro/ci/drift.gitlab-ci.yml'
+#
+# Start with allow_failure: true. Flip it to false once the packages you care
+# about are actually linked — a gate that fires on day one for unbound docs gets
+# disabled in a week and never comes back.
+
+drift:check:
+  stage: test
+  image: alpine:3.20
+  allow_failure: true          # <- flip to false once adoption is real
+  variables:
+    GIT_DEPTH: 0               # drift uses history for blame on stale anchors
+  before_script:
+    - apk add --no-cache curl bash git
+    - curl -fsSL https://drift.fp.dev/install.sh | sh
+    - export PATH="$HOME/.local/bin:$PATH"
+    - drift --version
+  script:
+    # Scope the check to what this MR touched, so the job stays fast and only
+    # complains about docs this change could plausibly have invalidated.
+    - |
+      BASE="${CI_MERGE_REQUEST_DIFF_BASE_SHA:-${CI_DEFAULT_BRANCH:-main}}"
+      CHANGED=$(git diff --name-only "$BASE"...HEAD -- '*.java' '*.go' | head -n 200)
+      if [ -z "$CHANGED" ]; then
+        echo "no Java or Go changes in this MR — nothing for drift to check"
+        exit 0
+      fi
+      echo "checking docs bound to:"; echo "$CHANGED" | sed 's/^/  /'
+      # shellcheck disable=SC2086
+      drift check --changed $CHANGED
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Optional companion: validate the steering docs and ADRs themselves.
+# Cheap, no network, catches the frontmatter/claims-table drift that drift itself
+# cannot see (it checks doc-vs-code, not doc-vs-doc).
+steering:validate:
+  stage: test
+  image: python:3.11-alpine
+  allow_failure: true
+  script:
+    - python3 .kiro/skills/steering-doc/scripts/validate.py --all
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      changes:
+        - "**/.steering/*.md"
+        - "**/.design/adrs/*.md"

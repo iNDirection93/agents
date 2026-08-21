@@ -1,0 +1,43 @@
+---
+title: Tod's mission — a delegation tree, not a state machine
+---
+flowchart TB
+    subgraph TODSESSION["one Tod session · one bead · tmux session tod-&lt;bd-id&gt;"]
+      direction TB
+      G0{{"G0 · preconditions<br/>branch deploy · site + version · auth · ticket · observability probe"}}:::gate
+
+      R1["<b>recon-todbot</b> · window: recon<br/><i>verify the issue with your own eyes</i>"]:::bot
+      A1(["10-repro-guide.md<br/>executed failure · signature · path:line · ledger"]):::art
+      G1{{"G1 · Tod reads the guide<br/>+ reviews the diff for behaviour changes"}}:::gate
+
+      S1["<b>sim-todbot</b> · window: sim<br/><i>a red test, for the right reason</i>"]:::bot
+      A2(["20-sim-report.md + the test<br/>rung · counterfactual · naivety check"]):::art
+      G2{{"G2 · Tod runs it<br/>+ records git hash-object of every test file"}}:::gate
+
+      T1["<b>terminator-todbot</b> · window: terminator<br/><i>make it pass · do not touch the test</i>"]:::bot
+      A3(["30-fix-report.md + the fix<br/>root cause · options · commit"]):::art
+      G3{{"G3 · Tod runs the test<br/>+ re-checks the hashes — changed = reject"}}:::gate
+
+      R2["<b>recon-todbot</b> · window: verify<br/><i>fresh context · re-run the bug</i>"]:::bot
+      A4(["40-verify-report.md<br/>clean? · new symptom? · ledger rated"]):::art
+      G4{{"G4 · Tod judges clean<br/>+ files the instrumentation cleanup bead"}}:::gate
+
+      G0 --> R1 --> A1 --> G1 --> S1 --> A2 --> G2 --> T1 --> A3 --> G3 --> R2 --> A4 --> G4
+    end
+
+    G4 ==>|"BUG-ELIMINATED"| OUT(["Bart · harvest"]):::exit
+    G1 -.->|"NO-REPRO"| X1(["closed"]):::exit
+    G3 -.->|"FIX-EXCEEDS-SCOPE"| X2(["Dr. Nick · DESIGN-DEFECT"]):::exit
+    G2 -.->|"cap hit"| X3(["NEEDS-HUMAN"]):::exit
+
+    NUDGE["supervision loop<br/>wait → STUCK → peek → nudge (max 2) → hand to the human<br/><i>tmux attach -t tod-&lt;bd-id&gt;</i>"]:::note
+    NUDGE -.- R1
+    NUDGE -.- S1
+    NUDGE -.- T1
+    NUDGE -.- R2
+
+    classDef bot  fill:#eef6ff,stroke:#2563eb,stroke-width:2px,color:#000
+    classDef art  fill:#f3f0ff,stroke:#7048e8,stroke-width:1px,color:#000
+    classDef gate fill:#fff4d6,stroke:#c98a00,stroke-width:3px,color:#000
+    classDef exit fill:#f1f3f5,stroke:#868e96,stroke-width:2px,color:#000
+    classDef note fill:#fff9db,stroke:#e8b100,stroke-dasharray:3 3,color:#000

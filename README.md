@@ -139,9 +139,6 @@ drift refs src/main/java/com/appian/mcp/tools/ToolSpecResolver.java
 
 ## Known gaps
 
-- **`.kiro/prompts/conventions.md` is referenced by Frink, Willie, and Lisa but is not in this copy.**
-  Either it didn't come across, or it's missing upstream too. Worth checking before the contribution
-  back.
 - **The OTel trace sink is designed, not deployed.** `.kiro/skills/todbot-observability/otel-trace-sink.md`
   has the manifest; until it lands, recon works from logs and says so.
 - **Cluster-signed JWTs for branch deployments are not wired.** The user pastes a token; `store.sh`

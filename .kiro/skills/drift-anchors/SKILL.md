@@ -41,6 +41,11 @@ $L --dry-run --all                   # print the drift commands, change nothing
 the code. Leave it `status: provisional` and let Bart link it once the symbols land — `drift link`
 against a missing file just fails.
 
+**A sweep over an empty set is not an error.** `--all` and `--package` exit 0 when they find no
+steering docs, because that is the correct state during bootstrap and in CI before the first doc
+lands. Naming an explicit doc that doesn't exist *is* an error — you asked for something you expected
+to be there.
+
 Not installed? `brew install fiberplane/tap/drift`, or
 `curl -fsSL https://drift.fp.dev/install.sh | sh`. `--dry-run` works without it.
 

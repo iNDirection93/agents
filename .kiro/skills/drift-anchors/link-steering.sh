@@ -17,21 +17,29 @@ ROOT="$(cd "$HERE/../../.." && pwd)"
 
 die() { printf 'drift-anchors: %s\n' "$*" >&2; exit 2; }
 
-DRY=0; DOCS=()
+DRY=0; SWEEP=0; DOCS=()
 while [ $# -gt 0 ]; do
   case $1 in
     --dry-run) DRY=1; shift ;;
-    --all)     shift
+    --all)     SWEEP=1; shift
                while IFS= read -r d; do DOCS+=("$d"); done < <(
                  find "$ROOT" -type d -name .git -prune -o -type d -name .steering -print0 2>/dev/null |
                  xargs -0 -I{} find {} -name '*.md' -type f 2>/dev/null | sort) ;;
-    --package) DIR=${2:?--package needs a directory}; shift 2
+    --package) SWEEP=1; DIR=${2:?--package needs a directory}; shift 2
                while IFS= read -r d; do DOCS+=("$d"); done < <(
                  find "$DIR/.steering" -name '*.md' -type f 2>/dev/null | sort) ;;
     *) DOCS+=("$1"); shift ;;
   esac
 done
-[ ${#DOCS[@]} -gt 0 ] || die "nothing to link. Pass a doc, --package DIR, or --all"
+# A sweep (--all / --package) over an empty set is a legitimate state, not an error:
+# during bootstrap no package has steering yet, and CI sweeps run before the first
+# doc lands. An explicit path that yields nothing IS an error — the caller named
+# something they expected to exist.
+if [ ${#DOCS[@]} -eq 0 ]; then
+  [ "$SWEEP" = 1 ] || die "nothing to link. Pass a doc, --package DIR, or --all"
+  printf 'no steering docs found — nothing to link\n'
+  exit 0
+fi
 
 if ! command -v drift >/dev/null 2>&1; then
   if [ "$DRY" = 0 ]; then

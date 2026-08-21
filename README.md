@@ -146,12 +146,19 @@ phases, ordered so each is independently useful and independently revertible:
 | Phase | Gives you | Cost |
 |---|---|---|
 | 1 · Agents | Dr. Nick, Tod, Bart on the roster | ~10 min |
-| 2 · Steering + drift | package knowledge that can't rot silently | ~1 hr + one package |
+| 2 · Drift tooling | the binary + the ignores, ready to bind docs | ~15 min |
 | 3 · CI gates | staleness and schema failures caught on the MR | ~30 min |
 | 4 · Todbots | the bug-elimination mission loop | ~30 min |
 | 5 · Trace sink | recon reads traces, not just logs | ~1 hr, optional forever |
 
-Phase 1 alone gets you the new agents. Nothing later is a prerequisite for anything earlier.
+Phase 1 alone gets you the new agents. Nothing later is a prerequisite for anything earlier, and
+**every phase installs machinery — none of them writes a document.** The first steering doc arrives
+with the first real design ticket, not as a setup step: a doc written to exercise the tooling is a
+doc nobody needed, which is the failure this design exists to prevent.
+
+Run the phases with **Flanders** in freeform (the guide is already the decomposition). The one part
+that isn't his is the first steering doc — writing steering prose is a design act, so that's Dr.
+Nick, on a real ticket.
 
 ## Known gaps
 

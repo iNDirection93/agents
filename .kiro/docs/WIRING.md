@@ -10,10 +10,26 @@ forever.
 | Phase | Gives you | Cost | Blocks |
 |---|---|---|---|
 | 1 · Agents | Dr. Nick, Tod, Bart on the roster | ~10 min | everything |
-| 2 · Steering + drift | package knowledge that can't rot silently | ~1 hr + 1 package | Bart's harvest |
+| 2 · Drift tooling | the binary + the ignores, ready to bind docs | ~15 min | Phase 3 |
 | 3 · CI gates | staleness and schema failures caught on the MR | ~30 min | — |
 | 4 · Todbots | the bug-elimination mission loop | ~30 min | Tod missions |
 | 5 · Trace sink | recon reads traces instead of only logs | ~1 hr, needs cluster access | nothing (degrades) |
+
+All five phases install **machinery**. None of them writes a document. The knowledge graph starts
+filling up through normal work — see [Your first steering doc](#your-first-steering-doc-not-a-setup-step)
+at the end, which is deliberately *not* a phase.
+
+## Who runs each phase
+
+| Work | Agent | Why |
+|---|---|---|
+| Phases 1–5, all of it | **Flanders**, freeform | binaries, config files, CI includes, manifests. `infra` is his area, and he tests live. |
+| The first steering doc + ADRs | **Dr. Nick** | writing steering prose is a design act; Flanders is explicitly forbidden from it |
+| Interactive auth (`glab auth login`, `sso-credentials`) | **you**, in your own terminal | browser SSO cannot run inside an agent session |
+
+**Freeform, not Bead Mode.** This guide *is* the decomposition — ordered, named files, verification
+checklists. Running Willie to turn a written plan into beads is overhead for work already broken
+down; he earns his keep when the breakdown isn't known yet.
 
 ---
 
@@ -46,9 +62,10 @@ identifiers, change them in the JSON — nothing else depends on the value.
 
 ---
 
-## Phase 2 · Steering, `.design`, and drift
+## Phase 2 · Drift tooling
 
-This is the phase with real work in it, and it is worth doing on **one package first**.
+Install the binary and the ignores. **Do not write any documents in this phase** — an empty
+`drift.lock` is a correct state, and the first real doc arrives through a design ticket.
 
 ### 2.1 Install drift
 
@@ -56,11 +73,12 @@ This is the phase with real work in it, and it is worth doing on **one package f
 brew install fiberplane/tap/drift
 # or: curl -fsSL https://drift.fp.dev/install.sh | sh
 drift --version
+drift check          # no bindings yet — passes trivially. That's the expected state.
 ```
 
-### 2.2 Add `.gitignore` entries
+### 2.2 Add the `.gitignore` entries
 
-The module ships a `.gitignore` in this repo; fold the relevant lines into the project's:
+The module ships a `.gitignore` in the agents repo; fold the relevant lines into the project's:
 
 ```gitignore
 # Ephemeral implementation guides — Dr. Nick writes, Willie consumes and deletes.
@@ -75,51 +93,25 @@ The module ships a `.gitignore` in this repo; fold the relevant lines into the p
 .kiro/harvest/
 ```
 
-### 2.3 Pick the first package and write its steering
+### 2.3 Confirm the projection script runs
 
-Pick one that is **small, well-understood, and actively worked on** — steering for a package nobody
-touches proves nothing. A leaf package with two or three collaborating files and one real invariant
-is ideal.
-
-```bash
-mkdir -p <pkg>/.steering <pkg>/.design/adrs
-cp .kiro/skills/steering-doc/templates/steering.md <pkg>/.steering/<topic>.md
-cp .kiro/skills/steering-doc/templates/design-changelog.md <pkg>/.design/DESIGN_CHANGELOG.md
-# fill them in — or better, let Dr. Nick do it in a real design session
-
-python3 .kiro/skills/steering-doc/scripts/validate.py --package <pkg>
-```
-
-The validator is strict on purpose. The two errors people hit first:
-
-- **frontmatter `claims` and the claims table disagree** — a row was added and the head wasn't
-  (or vice versa). It checks both directions.
-- **over 120 lines** — the package owns two things, or the doc is narrating code. Fix the cause, not
-  the line count.
-
-### 2.4 Bind it to code
+`link-steering.sh` reads a steering doc's frontmatter `covers:` list and runs `drift link` for each
+entry. With no docs yet there is nothing to link, so just prove the script is reachable:
 
 ```bash
-.kiro/skills/drift-anchors/link-steering.sh --dry-run <pkg>/.steering/<topic>.md   # see the commands
-.kiro/skills/drift-anchors/link-steering.sh <pkg>/.steering/<topic>.md             # stamp them
-git add drift.lock && git commit -m "<TICKET>: bind <pkg> steering to code"
+.kiro/skills/drift-anchors/link-steering.sh --dry-run --all
+# expect: "no steering docs found — nothing to link", exit 0.
+# A sweep over an empty set is a legitimate state, not a failure — which is
+# what makes it safe to put in CI before the first doc exists.
+
+python3 .kiro/skills/steering-doc/scripts/validate.py --self-test
+python3 .kiro/skills/steering-doc/scripts/validate.py --all    # "no steering docs or ADRs found"
 ```
 
-`drift.lock` lives at the **repo root** and is committed. Never hand-edit it — `link-steering.sh`
-projects the doc's `covers:` list into it, so the frontmatter stays the thing humans and agents edit.
-
-`SKIP … (file does not exist yet)` is expected for greenfield steering written before the code.
-Leave the doc `status: provisional`; Bart links it once the symbols land.
-
-- [ ] `drift check` passes
-- [ ] `drift refs <a file in the package>` names the steering doc
-- [ ] `validate.py --package <pkg>` is clean
-
-### 2.5 Then stop
-
-Do **not** convert the repo. `knowledge-graph-conventions.md` §9 is touch-to-migrate: a package gets
-steering when someone does design work there. Copying stale content forward is worse than a missing
-doc, because it looks maintained.
+- [ ] `drift --version` works
+- [ ] `drift check` exits 0 with no bindings
+- [ ] `validate.py --self-test` is clean
+- [ ] A file under any `.design/guides/` is ignored by git
 
 ---
 
@@ -138,22 +130,24 @@ include:
 | `drift:check` | MR touching `.java`/`.go` | code changed, bound doc didn't |
 | `steering:validate` | MR touching `.steering/` or `.design/adrs/` | schema, section order, claim/anchor mismatch, the 120-line cap |
 
-**Both ship `allow_failure: true`. Leave it that way until Phase 2 has covered a few real packages.**
-A gate that fires on day one for docs nobody has bound yet gets disabled in a week and never comes
+**Both ship `allow_failure: true`, and installing them before any doc exists costs nothing** — with
+an empty lockfile they pass trivially. Leave them non-blocking until a few real packages are bound.
+A gate that fires on day one for docs nobody has written gets disabled in a week and never comes
 back. Flip to `false` when `drift check` is green on main and people have started noticing it.
 
 The job installs drift via the shell installer on each run. If your runners can't reach
 `drift.fp.dev`, vendor the binary into your CI image and drop the `before_script` install line.
 
-- [ ] An MR that edits a bound symbol without touching its doc goes red
-- [ ] An MR that edits a steering doc with a bad claim id goes red
+- [ ] Both jobs appear on an MR and pass
 - [ ] Neither fires on unrelated MRs
+- [ ] Later, once a doc is bound: an MR editing a bound symbol without its doc goes red
 
 ### The red window is deliberate
 
-CI stays red between "code landed" and "harvest ran", because **only Bart re-stamps anchors**.
-Flanders records `drift check --changed` in his close reason and moves on; Bart adjudicates at the
-end of the session — re-stamp if the doc is still true, bead for Dr. Nick if it isn't.
+Once docs are bound, CI stays red between "code landed" and "harvest ran", because **only Bart
+re-stamps anchors**. Flanders records `drift check --changed` in his close reason and moves on; Bart
+adjudicates at the end of the session — re-stamp if the doc is still true, bead for Dr. Nick if it
+isn't.
 
 That window is the mechanism that makes the harvest non-optional. If you find it annoying, the fix
 is to run the harvest, not to let implementers re-stamp their own anchors.
@@ -172,7 +166,7 @@ kubectl version --request-timeout=5s
 
 `glab auth login` and `sso-credentials sites-dev EKSClusterAdmin` are **interactive** and cannot be
 run from inside an agent session. When cluster credentials expire mid-mission, that surfaces as
-`BLOCKED:ENV` and the user re-auths in their own terminal, then starts a new session.
+`BLOCKED:ENV` and you re-auth in your own terminal, then start a new session.
 
 ### 4.2 Confirm how a Kiro agent is launched
 
@@ -280,6 +274,63 @@ exhaustion); for everything else a metric confirms something is wrong, which you
 
 ---
 
+## Your first steering doc — not a setup step
+
+The machinery is now installed and every gate passes on an empty lockfile. **Do not now go and write
+a steering doc to prove it works.**
+
+A doc written to exercise the tooling is a doc nobody needed — which is precisely the failure this
+whole design exists to prevent. It will be accurate on the day it's written, nobody will have reason
+to read it, and it will rot into the thing that makes people distrust the rest. That is the
+touch-to-migrate rule (`knowledge-graph-conventions.md` §9) applied to the bootstrap itself.
+
+Instead, **the first real design ticket creates it.** When that lands:
+
+1. Open **Dr. Nick** with the ticket. He walks the tree, reads what exists, and does the design.
+2. He writes `<pkg>/.steering/<topic>.md`, the ADRs, and the changelog row — because someone needed
+   the design, not because the pipeline needed a fixture.
+3. He runs the validator, and `link-steering.sh` if the symbols already exist:
+   ```bash
+   python3 .kiro/skills/steering-doc/scripts/validate.py --package <pkg>
+   .kiro/skills/drift-anchors/link-steering.sh <pkg>/.steering/<topic>.md
+   git add drift.lock <pkg>/.steering <pkg>/.design
+   ```
+4. `drift.lock` gets its first real binding, and CI starts having an opinion.
+
+The validator is strict on purpose, and the two errors people hit first are:
+
+- **frontmatter `claims` and the claims table disagree** — a row was added and the head wasn't, or
+  the reverse. It checks both directions.
+- **over 120 lines** — the package owns two things, or the doc is narrating code. Fix the cause, not
+  the line count.
+
+`SKIP … (file does not exist yet)` from `link-steering.sh` is expected when steering is written
+before the code. Leave the doc `status: provisional`; Bart links it at the harvest once the symbols
+land.
+
+---
+
+## The bootstrap gap
+
+**Willie can't allocate this work, and Bart can't harvest it.** Say it out loud now so it isn't
+alarming later.
+
+The wiring has no owning package with steering — that's what it's setting up — so there are no
+`pkg:` labels to assign, and there is no design for the harvest to reconcile the implementation
+against. The graph does not close on its own installation.
+
+Practical consequences, all expected:
+
+- Flanders' close reason for wiring work will read `PACKAGES: none` and `DRIFT: n/a`. That's correct,
+  not a lapse.
+- Don't wait for a `HARVESTED` emit on any of this. There is nothing to harvest.
+- Don't file a DECOMPOSE bead for it. This guide is the decomposition.
+
+The graph starts applying to itself with the **first real ticket after Phase 3 lands** — that ticket
+gets a package, a steering doc, a `pkg:` label, and a harvest. From then on the loop is closed.
+
+---
+
 ## Verification, all phases
 
 ```bash
@@ -298,11 +349,13 @@ drift status | head -20
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| `drift check` passes but finds nothing | no bindings yet | correct after Phase 2 — the first doc arrives with the first design ticket |
 | `drift link` fails on a symbol | greenfield — code isn't written yet | leave `status: provisional`; Bart links at harvest |
 | `drift check` red right after a merge | correct — the harvest hasn't run | run Bart; don't re-stamp as the implementer |
 | `validate.py` errors on claim ids | frontmatter and table disagree | fix both; it checks in both directions |
 | todbot window opens and dies instantly | `TODBOT_CLI` wrong | `peek.sh` shows the shell error; fix `todbots.config.local.sh` |
 | `wait.sh` returns `STUCK` on a working bot | bot is thinking longer than `TODBOT_STUCK_SECS` | raise it; stuck is "log stopped growing", not a judgement |
-| `push.sh` exits 3 | protected branch, no approval | correct — Tod asks the user, records it, retries with `TODBOT_PUSH_APPROVED=1` |
+| `push.sh` exits 3 | protected branch, no approval | correct — Tod asks you, records it, retries with `TODBOT_PUSH_APPROVED=1` |
 | `probe.sh` says everything dark | cluster credentials expired | `sso-credentials sites-dev EKSClusterAdmin` in your own terminal, then a new session |
 | A `.design/guides/*` file is in a commit | the gitignore entry is missing | add it; Willie should have deleted the guide after decomposing |
+| Flanders closes a wiring bead with `PACKAGES: none` | the bootstrap gap | expected — see above |

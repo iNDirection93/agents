@@ -546,9 +546,20 @@ leaves work nobody will pick up.
 | Emit | Condition | Next |
 |---|---|---|
 | `BEAD-DONE` | the bead is implemented, tested live, committed, and closed | the next bead — **or Bart, when it was the session's last** |
-| `BEAD-WRONG` | the bead cannot be implemented as written: wrong scope, wrong file, a prerequisite that doesn't exist | Willie |
+| `BEAD-WRONG` | the bead cannot be implemented as written: wrong scope, wrong file, a prerequisite that doesn't exist — **or it needs more than this session can sustain** (below) | Willie |
 | `DESIGN-DEFECT` | doing this properly means changing a boundary, a contract, or something an accepted ADR decided | Dr. Nick |
 | `NEEDS-REPRO` | there's a bug here and you cannot explain it — see *When to Hand Off to Tod* | Tod |
+
+**Two failed attempts on a bead is a `BEAD-WRONG`, not a third attempt.** Report the observable
+fact — what you tried, what happened, why the bead is harder than it reads — and let Willie re-plan.
+He allocated this bead from what Lisa found before you opened it; if it turned out to be a tangle, he
+is the one who re-scopes it or re-labels it, and he does that with fresh context rather than the
+context that just spent an hour going the wrong way.
+
+Two things this is **not**: it is not failure, and it is not yours to power through. A bead that
+quietly takes four hours because you wouldn't hand it back costs more than the handoff ever would.
+(If the trouble is a bug you can't *explain* rather than work you can't *finish*, that's
+`NEEDS-REPRO` → Tod instead — see *When to Hand Off to Tod*.)
 
 **`BEAD-DONE` on the last bead of a session is a handoff, not a full stop.** Say so out loud:
 

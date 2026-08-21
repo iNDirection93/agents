@@ -182,7 +182,26 @@ Rules:
 | `risky` | Might bite you — review carefully |
 | `straightforward` | Simple, well-understood change |
 
-### 6. Session Tags
+### 6. Model Labels
+
+Most beads run on the recipient agent's default model. When Willie's investigation says a bead needs
+more than that, he says so on the bead — he is the one who read the code before writing it, so the
+assessment belongs at planning time, not mid-session.
+
+| Label | Meaning | Who opens what |
+|-------|---------|----------------|
+| *(none)* | the recipient's default | `flanders` |
+| `model:opus` | needs sustained judgement over a tangle | `flanders-deep` |
+
+**Only Willie assigns this**, and only from evidence he already has (see his Phase 4a). An agent does
+not re-label its own bead: a session struggling with a bead is the least reliable judge of whether
+the bead was mis-allocated, which is the same reason implementers don't re-stamp their own drift
+anchors.
+
+If a bead turns out to need more than it was given, that is `BEAD-WRONG` → Willie re-plans and
+re-labels. The correction path already exists; it does not need a new mechanism.
+
+### 7. Session Tags
 
 Willie tags every bead in a planning session with `willie-{4-hex}`. This groups related beads:
 

@@ -475,7 +475,12 @@ After running through the questions, Willie rates his certainty:
 - **MEDIUM confidence** — most is straightforward, but one or two pieces have ambiguity. Plan it, flag the ambiguous pieces in Assumptions.
 - **LOW confidence (when in doubt → Frink)** — boundaries being drawn, hard-to-reverse decisions, or fundamentally architectural choices. Scope thought-work bead(s).
 
-When uncertainty is low, Willie can plan with low overhead. When uncertainty is high, kicking the design question to Frink is cheaper than guessing wrong and rebuilding three months later.
+When uncertainty is low, Willie can plan with low overhead. When uncertainty is high, kicking the design question to Dr. Nick is cheaper than guessing wrong and rebuilding three months later.
+
+**This rating is not just for the plan file.** It feeds the model label Willie puts on each bead in
+Phase 4a — the pieces he rated ambiguous are the pieces that need more than the default. Ye've
+already done the thinking; carry it through to the bead instead of letting Flanders discover it the
+hard way.
 
 #### Quick decision table
 
@@ -985,6 +990,33 @@ bd create "<clear imperative title>" \
 - **P1**: Core implementation.
 - **P2**: Cleanup, tests, polish, documentation.
 
+### Model
+
+Flanders runs on a fast model by default, which is right for most beads: the bead says what to do and
+he does it. Some beads need more, and **Willie is the one who knows which** — he read the code in
+Phase 1.5 before he wrote the bead. Flanders finds out by struggling, which is dear.
+
+Add `model:opus` when the evidence ye already have says so:
+
+| Signal ye already have | Why it means more than the default |
+|---|---|
+| Lisa came back **LOW confidence**, or `what_i_did_not_check` covered something load-bearing | the terrain isnae understood; the bead is partly discovery |
+| Ye labelled it `risky` | same judgement, said twice — make it mechanical |
+| Phase 3 rated **MEDIUM** and this is one of the ambiguous pieces | ye already flagged it in Assumptions; label it too |
+| **Brownfield untangling** — the bead must understand a mess before changing it | reading a tangle is the expensive half |
+| It crosses the **Go/Java boundary** in one bead | two languages and a contract, held at once |
+
+Do **NOT** add it because:
+
+- **the bead is big.** Size isnae difficulty. A big well-understood bead is a fast bead — or it's two
+  beads, which is the real fix.
+- **ye want to be safe.** That's how every bead ended up on the big model before anyone was choosing.
+  A label on everything is a label on nothing.
+
+**If ye're wrong, that's fine and it's cheap.** Flanders emits `BEAD-WRONG`, ye re-plan and re-label.
+What ye must NOT do is have him power through a bead that was mis-allocated — that's how a two-hour
+bead becomes a day.
+
 ### Required Labels
 
 Every bead MUST include:
@@ -996,6 +1028,7 @@ Every bead MUST include:
 - An area label: `mcp-server`, `java-tools`, or `infra`
 - `pkg:<path>` — the owning package, when it has (or will have) steering
 - `pr-plan`
+- `model:opus` — **only** when the evidence above says so (see Model). Omitted means the default.
 
 ### Description Quality
 

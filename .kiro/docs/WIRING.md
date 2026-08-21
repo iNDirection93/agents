@@ -50,7 +50,7 @@ done
 ```
 
 - [ ] `kiro-cli chat --agent drnick` starts and Dr. Nick introduces himself
-- [ ] Same for `tod`, `bart`
+- [ ] Same for `tod`, `bart`, and `flanders-deep`
 - [ ] `bd list --label drnick --status open` runs (beads is already installed for the other agents)
 
 **Check the model IDs.** Allocation and reasoning are in

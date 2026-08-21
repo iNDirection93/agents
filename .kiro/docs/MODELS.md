@@ -18,7 +18,8 @@ capable-over-a-narrow-view is a different purchase from capable-over-a-large-vie
 | **Frink** | Opus 5 | complex | long | multi-turn design dialogue, 4–8 oracle returns, and a whole design document held at once |
 | **Dr. Nick** | Opus 5 | complex | long | the co-design conversation is the long part, even though his *artifacts* are small |
 | **Willie** | Opus 5 | complex | long | stigmergic scan, parallel Lisa returns, a ≤500-line plan, and package allocation across the tree |
-| **Flanders** | Sonnet 5 | mostly simple | medium | the bead defines the work; **the one seat where escalation matters** — see below |
+| **Flanders** | Sonnet 5 | mostly simple | medium | the bead defines the work — **and the bead also carries the model**, see below |
+| **Flanders (deep)** | Opus 5 | complex | medium | the same agent, opened when Willie labelled the bead `model:opus` |
 | **Tod** | Sol | complex | small | gate judgement and adjudication over five short report files. He never reads code |
 | **Bart** | Sol | complex | medium | the `ADAPTED` vs `DID-NOT-FOLLOW` call — hard judgement over close reasons and diffs |
 | **Lisa** | Sonnet 5 | simple | medium | one scoped question in, a structured answer out |
@@ -27,7 +28,7 @@ capable-over-a-narrow-view is a different purchase from capable-over-a-large-vie
 | **sim-todbot** | Sol | complex | small | test-design judgement — the anti-naive rubric — over a repro guide and one test file |
 | **terminator-todbot** | Sonnet 5 | simple | small | the origin is named, the test is given, make it green without touching it |
 
-Three Opus seats, five Sol, three Sonnet.
+Three Opus seats, five Sol, three Sonnet — plus one dual-bound seat (Flanders).
 
 ## Why so little Opus
 
@@ -43,17 +44,62 @@ reads closed beads, the todbots each answer one question.
 So the check when you are tempted to put a new agent on Opus is: *does it talk with a person for a
 long time, or does it read one thing and decide?* The second is a Sol seat.
 
-## Escalation
+## The one variable seat
 
-**Flanders is the only seat where a session's difficulty changes underneath you.** Most beads are
-well-defined — implement what the bead says, test it live, commit. But the debug loop is open-ended,
-and a bead that looked simple can turn into an afternoon of tracing.
+Every agent has a fixed difficulty because it has a fixed job — except **Flanders**, whose difficulty
+comes from the bead rather than from the role. Most beads are well-defined: the bead says what to do
+and he does it. Some are a brownfield tangle wearing a one-line description.
 
-Run him on Sonnet 5 and escalate the session when the loop deepens. The signal is concrete: **two
-failed fix attempts.** That is also the trigger for handing the bug to Tod, so the decision is the
-same one either way — escalate the model, or escalate to the bug graph.
+**Willie sets the model, on the bead, at planning time.** Not Flanders, mid-session.
 
-Everything else has a fixed difficulty because it has a fixed job.
+Two reasons, and the second is the load-bearing one:
+
+1. **Willie has the evidence and Flanders doesn't.** Willie read the code in Phase 1.5 through Lisa
+   before he wrote the bead. He knows whether the area came back LOW confidence, whether it crosses
+   the Go/Java boundary, whether it's a tangle. Flanders finds all of that out by hitting it.
+2. **A session struggling with a bead is the least reliable judge of whether the bead was
+   mis-allocated.** The context that has spent an hour going the wrong way is exactly the context
+   that would be assessing "am I on the wrong model?" That is the same argument that keeps
+   implementers from re-stamping their own drift anchors, and it holds here for the same reason.
+
+There is a third, quieter reason: by the time a session *knows* it's out of its depth, escalating
+means reopening cold anyway. The exploration is already spent. Better to have started right.
+
+### The mechanism
+
+Willie adds `model:opus` to a bead from signals he already produces — a LOW-confidence Lisa return, a
+`risky` label, a MEDIUM design-smell rating on that specific piece, a brownfield untangling, a
+Go/Java boundary crossing. **This is not a new judgement**; his prompt already rates every one of
+those and, until now, none of it drove anything. See Willie's *Model* section for the table, and for
+the two reasons that are explicitly *not* grounds: bead size (size isn't difficulty — split it), and
+defensiveness (a label on everything is a label on nothing).
+
+The config schema pins a model per agent, so the label points at a second config:
+
+| Bead label | Open |
+|---|---|
+| *(none)* | `flanders` — Sonnet 5 |
+| `model:opus` | `flanders-deep` — Opus 5 |
+
+`flanders-deep.json` differs from `flanders.json` in exactly three fields: name, model, description.
+Same prompt file, same tools, same exits. It is **not** a second agent — it is one agent with two
+model bindings, and it only exists as a separate file because the config format gives no other way to
+express that. (If your Kiro CLI supports a launch-time model override, drop the second config and let
+the label alone tell you what to pass.)
+
+### When Willie guesses wrong
+
+He will sometimes, and it costs almost nothing, because **the correction path already exists in the
+graph**:
+
+- The bead turns out to be a tangle → Flanders emits **`BEAD-WRONG`** after two failed attempts →
+  Willie re-plans and re-labels, with fresh context.
+- It's a bug he can't *explain* rather than work he can't *finish* → **`NEEDS-REPRO`** → Tod, whose
+  recon-todbot is on a different model doing exactly that job.
+
+No new exit, no new mechanism, no self-diagnosis. Flanders reports an **observable fact** — two
+attempts, here's what happened — and the graph routes it. What he must not do is power through: a
+bead that quietly takes four hours because nobody handed it back costs far more than the handoff.
 
 ## What to watch
 
@@ -83,7 +129,7 @@ better fix, and it will land both halves on cheaper models.
 ## Identifiers
 
 ```
-claude-opus-5      Frink, Dr. Nick, Willie
+claude-opus-5      Frink, Dr. Nick, Willie, Flanders-deep
 claude-sonnet-5    Flanders, Lisa, terminator-todbot
 gpt-5.6-sol        Tod, Bart, Comic Book Guy, recon-todbot, sim-todbot
 ```

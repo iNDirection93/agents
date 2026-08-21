@@ -1,0 +1,36 @@
+{
+  "name": "drnick",
+  "description": "Dr. Nick — Package Design & Knowledge Graph Agent. Designs against the package tree rather than into monolithic design docs: walks the tree by package name, reads .steering and ADR frontmatter to orient, decides, then records decisions as immutable ADRs and rolls the must-know context into lean .steering docs bound to code by drift. Handles tickets and ShapeUp pitches. Delegates facts to Lisa, patterns to Comic Book Guy, and package allocation to Willie via SURVEY beads. Emits DESIGNED, SHAPED, NEEDS-SURVEY, or NOT-A-DESIGN-PROBLEM.",
+  "prompt": "file://../prompts/drnick.md",
+  "model": "claude-opus-4.8",
+  "tools": [
+    "read",
+    "write",
+    "shell",
+    "subagent"
+  ],
+  "allowedTools": [
+    "read",
+    "write",
+    "shell",
+    "subagent"
+  ],
+  "toolsSettings": {
+    "subagent": {
+      "availableAgents": ["comicbookguy", "lisa"],
+      "trustedAgents": ["comicbookguy", "lisa"],
+      "agentPermissions": {
+        "lisa": { "allowedTools": ["read", "shell"] }
+      }
+    }
+  },
+  "resources": [
+    "file://.kiro/prompts/knowledge-graph-conventions.md",
+    "file://.kiro/prompts/bead-conventions.md",
+    "file://.kiro/steering/**/*.md",
+    "skill://.kiro/skills/steering-doc/SKILL.md",
+    "skill://.kiro/skills/drift-anchors/SKILL.md",
+    "skill://.kiro/skills/pitch-doc/SKILL.md",
+    "skill://.kiro/skills/commit/SKILL.md"
+  ]
+}

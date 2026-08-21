@@ -140,12 +140,24 @@ A ticket arrives — from Willie, from Flanders, from Bart, or from the user dir
 
 ### Pitch workflow
 
-A broad feature, pre-commitment, with an appetite. Use the `pitch-doc` skill; the pitch goes to
-`docs/.pitches/<slug>.md`. Shape at low resolution: name rabbit holes, don't solve them. No ADRs, no
-claims, no anchors — nothing is decided yet.
+A broad feature, pre-commitment, with an appetite. Use the `pitch-doc` skill — it carries the house
+format and the craft guidance. The pitch goes to `docs/.pitches/<slug>.md`. No ADRs, no claims, no
+anchors: nothing is decided yet.
 
-Note the skill's pin: the guidance on *what makes a pitch good* is deliberately unfinished. Work from
-the template, keep the resolution low, and ask the user rather than inventing house style.
+The three moves that matter most, because they are what a betting table actually needs:
+
+1. **Name the trap in the framing.** The naive statement of the work usually puts the cost in the
+   wrong place. Relocating it is most of the value a pitch adds — a table can decide about the real
+   work and cannot decide about a framing that hides it. Then say why the bet is *contained*: what is
+   already built, already paid for, already reusable.
+2. **Cite, don't guess.** "What we know going in" is a table of confirmed facts with `path:line`
+   citations — send Lisa for them. Anything you don't know is an Open Question with a `Gates:` line,
+   not a confident row in the facts table.
+3. **Name rabbit holes; don't solve them.** A rabbit hole is a *temptation* a competent person would
+   feel, not a generic risk. Solving one in the pitch is over-resolution, which is the classic
+   shaping failure.
+
+Your **Design Decisions** table becomes the ADRs if the bet is won — write it as if it will be.
 
 Emit `SHAPED` and stop. Shaping and specifying in one session is how a pitch ends up at the
 resolution of a design doc, which makes it useless for deciding.

@@ -106,14 +106,14 @@ rewriting a doc to match code that ignored a decision is how a system forgets it
   skills/          procedures agents load on demand
     steering-doc/    templates + validate.py for steering and ADRs
     drift-anchors/   covers: → drift.lock projection
-    pitch-doc/       ShapeUp pitches (quality guidance deliberately pinned)
+    pitch-doc/       ShapeUp pitches — house format + craft guidance
     todbot-tmux/     spawn, peek, wait, nudge, teardown + the sentinel protocol
     todbot-auth/     credentials in, never out
     todbot-observability/  logs, traces, metrics + the OTel sink design
     todbot-pipeline/ glab + the push policy
     commit/, claims-table/, frink-design-doc/, scaffold-*/, point-site-to-branch/
   ci/              drift.gitlab-ci.yml — the staleness gate
-  docs/            the graphs
+  docs/            WIRING.md (setup) + the graphs
   mcp/nedops/      the dev-session MCP server (Go)
   corpus/          Comic Book Guy's pattern corpus
   todbots.config.sh   todbot knobs; override in todbots.config.local.sh (gitignored)
@@ -137,13 +137,27 @@ drift refs src/main/java/com/appian/mcp/tools/ToolSpecResolver.java
 `drift` is [fiberplane/drift](https://github.com/fiberplane/drift) —
 `brew install fiberplane/tap/drift`.
 
+## Standing it up in the project
+
+Some of this needs things to exist outside `.kiro/` — a binary installed, a CI job included, a config
+filled in, a pod deployed. **[`.kiro/docs/WIRING.md`](.kiro/docs/WIRING.md)** walks through it in five
+phases, ordered so each is independently useful and independently revertible:
+
+| Phase | Gives you | Cost |
+|---|---|---|
+| 1 · Agents | Dr. Nick, Tod, Bart on the roster | ~10 min |
+| 2 · Steering + drift | package knowledge that can't rot silently | ~1 hr + one package |
+| 3 · CI gates | staleness and schema failures caught on the MR | ~30 min |
+| 4 · Todbots | the bug-elimination mission loop | ~30 min |
+| 5 · Trace sink | recon reads traces, not just logs | ~1 hr, optional forever |
+
+Phase 1 alone gets you the new agents. Nothing later is a prerequisite for anything earlier.
+
 ## Known gaps
 
 - **The OTel trace sink is designed, not deployed.** `.kiro/skills/todbot-observability/otel-trace-sink.md`
   has the manifest; until it lands, recon works from logs and says so.
 - **Cluster-signed JWTs for branch deployments are not wired.** The user pastes a token; `store.sh`
   keeps it out of the logs. The shape of the automated path is documented in `todbot-auth/SKILL.md`.
-- **Pitch quality guidance is deliberately unfinished** — the mechanics are there, the craft is
-  pinned, and the open questions are written down at the bottom of `pitch-doc/SKILL.md`.
 - **`drift check` in CI ships `allow_failure: true`.** Flip it once real packages are linked; a gate
   that fires on day one for unbound docs gets disabled in a week and never comes back.

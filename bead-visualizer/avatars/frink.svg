@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" role="img" aria-label="frink — legacy design">
+  <rect width="56" height="56" fill="#141026"/>
+  <circle cx="28" cy="28" r="26" fill="none" stroke="#A79FC4" stroke-opacity="0.25" stroke-width="1"/>
+  <path d="M22 14 v14 l-8 16 h28 l-8 -16 v-14 Z" fill="none" stroke="#A79FC4" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

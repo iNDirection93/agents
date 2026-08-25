@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+# UI preference — the only state this app owns, and it is per-machine.
+.beadviz-prefs.json
+
+# Generated demo data. Rebuild with scripts/make-fixture.mjs.
+fixtures/

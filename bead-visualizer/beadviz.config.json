@@ -1,0 +1,12 @@
+{
+  "_comment": "Defaults match .kiro/prompts/bead-conventions.md. Point repoRoot at the checkout that owns .beads/.",
+  "repoRoot": "..",
+  "bdBinary": "bd",
+  "port": 5177,
+  "sessionLabelPattern": "^willie-[0-9a-f]{4}$",
+  "agentLabels": ["willie", "frink", "drnick", "flanders", "tod", "bart", "lisa"],
+  "branchLabelPrefix": "branch:",
+  "gateLabels": ["gate", "foundation"],
+  "gateLabelPrefixes": ["exit:"],
+  "scopeArgsTemplate": ["--label", "{session}"]
+}

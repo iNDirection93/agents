@@ -1,0 +1,360 @@
+/* ------------------------------------------------------------------ canvas */
+
+.flow-root {
+  position: absolute;
+  inset: 0;
+}
+
+.react-flow__pane {
+  cursor: default;
+}
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__node {
+  cursor: pointer;
+}
+.react-flow__handle {
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+}
+
+/* -------------------------------------------------------------------- node */
+
+.bead {
+  position: relative;
+  width: var(--node-hit);
+  height: var(--node-hit);
+  display: grid;
+  grid-template-rows: var(--node-size) 1fr;
+  justify-items: center;
+  /* Falls back to the status colour when the manifest gives an agent no hue. */
+  --ring: var(--status-backlog);
+  --glow-strength: 0;
+  transition: opacity var(--t-mid) var(--ease-out);
+}
+
+.bead[data-status='backlog'] { --ring: var(--status-backlog); --glow-strength: 0; --agent-ring-opacity: 0.32; }
+.bead[data-status='ready'] { --ring: var(--status-ready); --glow-strength: 1; --agent-ring-opacity: 0.9; }
+.bead[data-status='in_progress'] { --ring: var(--status-in_progress); --glow-strength: 0.85; --agent-ring-opacity: 0.9; }
+.bead[data-status='blocked'] { --ring: var(--status-blocked); --glow-strength: 0.8; --agent-ring-opacity: 0.85; }
+.bead[data-status='done'] { --ring: var(--status-done); --glow-strength: 0.3; --agent-ring-opacity: 0.4; }
+.bead[data-gate='true'] { --ring: var(--status-gate); }
+
+/*
+ * The agent hue is a *second* channel, never the ring itself.
+ *
+ * Letting it replace the ring colour was the obvious reading of "tints that agent's
+ * node ring" and it is wrong: it makes a lime-hued agent's blocked bead look ready.
+ * Status owns the ring and the glow, because brightness has to keep meaning
+ * liveness; the agent gets a thin concentric ring inside it, which is still enough
+ * to pick one agent out of forty at a glance.
+ */
+.bead__agent-ring {
+  fill: none;
+  stroke: var(--agent-hue, transparent);
+  stroke-width: 1.5;
+  /*
+   * Scaled with the status's own emission. At full strength on a backlog bead the
+   * agent ring is the brightest thing on an unlit node, which reads as "live" and
+   * undoes the one rule the whole palette rests on.
+   */
+  stroke-opacity: var(--agent-ring-opacity, 0.9);
+}
+
+/* Dimming unconnected work is what makes a dense graph usable (§6.1). */
+.bead[data-emphasis='dimmed'] { opacity: 0.25; }
+
+.bead__figure {
+  position: relative;
+  width: var(--node-size);
+  height: var(--node-size);
+  display: grid;
+  place-items: center;
+}
+
+/*
+ * The glow is a box-shadow on a circular element, not an SVG filter. A filter is a
+ * per-element raster pass; at 200 nodes that is the difference between a canvas you
+ * can pan and one you can't.
+ */
+.bead__halo {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  box-shadow: 0 0 calc(14px * var(--glow-strength)) calc(1px * var(--glow-strength)) var(--ring);
+  opacity: var(--glow-strength);
+  transition: box-shadow var(--t-mid) var(--ease-out), opacity var(--t-mid) var(--ease-out);
+  pointer-events: none;
+}
+
+.bead[data-gate='true'] .bead__halo {
+  border-radius: 12%;
+}
+
+.bead__svg {
+  position: relative;
+  width: var(--node-size);
+  height: var(--node-size);
+  overflow: visible;
+}
+
+/* The plate sits under the avatar; the ring is stroke-only so it can sit over it. */
+.bead__plate {
+  fill: var(--panel);
+}
+
+.bead__ring {
+  fill: none;
+  stroke: var(--ring);
+  stroke-width: 2;
+  transition: stroke var(--t-mid) var(--ease-out), stroke-width var(--t-fast) var(--ease-out);
+}
+
+/* Every status carries a ring treatment as well as a colour, so the graph
+   survives colourblindness and a greyscale screenshot (§4). */
+.bead[data-status='backlog'] .bead__ring {
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.bead[data-status='done'] .bead__ring {
+  stroke-width: 1;
+  stroke-opacity: 0.55;
+}
+.bead__notches {
+  stroke: var(--ring);
+  stroke-width: 2;
+  display: none;
+}
+.bead[data-status='blocked'] .bead__notches {
+  display: block;
+}
+
+.bead__avatar {
+  /* clipPath rather than border-radius: the hexagon gate needs the same mechanism. */
+  clip-path: url(#bead-clip);
+}
+
+.bead__gate-label {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 9px;
+  fill: var(--text-hi);
+  text-anchor: middle;
+  letter-spacing: 0.04em;
+}
+
+/* Always visible, not hover-only: a graph you must hover 40 times to read is
+   worse than one you can scan (§6.1). */
+.bead__id {
+  font-size: var(--fs-caption);
+  color: var(--text-caption);
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  white-space: nowrap;
+  transition: color var(--t-fast) var(--ease-out);
+}
+
+.bead[data-emphasis='lit'] .bead__id,
+.bead[data-emphasis='selected'] .bead__id,
+.bead:hover .bead__id {
+  color: var(--text-mid);
+}
+
+/* Hover and focus produce the identical visual — keyboard parity is not optional. */
+.bead:hover .bead__ring,
+.bead[data-focused='true'] .bead__ring {
+  stroke: var(--hot-core);
+  stroke-width: 2.5;
+  stroke-dasharray: none;
+  stroke-opacity: 1;
+}
+.bead:hover .bead__halo,
+.bead[data-focused='true'] .bead__halo {
+  box-shadow: 0 0 28px 2px var(--ring);
+  opacity: 1;
+}
+
+.bead[data-emphasis='selected'] .bead__ring {
+  stroke-width: 3;
+  stroke-dasharray: none;
+  stroke-opacity: 1;
+}
+
+/*
+ * A real <button> so the node is reachable, announceable and clickable by every
+ * input device — which means resetting the UA's button chrome, or its grey
+ * background paints straight over the sign.
+ */
+.bead__hit {
+  position: absolute;
+  inset: 0;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.bead__hit:focus-visible {
+  outline: 2px solid var(--hot-core);
+  outline-offset: 3px;
+}
+
+/* In progress is *buzzing*: a slow luminance flicker, and the entire motion
+   inventory alongside the power-on sequence. */
+@keyframes tube-buzz {
+  0%, 42%, 46%, 100% { opacity: 1; }
+  44% { opacity: 0.72; }
+  62% { opacity: 0.93; }
+  64% { opacity: 1; }
+}
+
+.bead[data-status='in_progress'][data-motion='on'] .bead__halo {
+  animation: tube-buzz 3s ease-in-out infinite;
+}
+
+/* Powering on: current flows outward along the dependency direction. */
+@keyframes power-on {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.powering .bead {
+  animation: power-on 320ms var(--ease-out) both;
+  animation-delay: var(--power-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bead[data-status='in_progress'][data-motion='on'] .bead__halo {
+    animation: none;
+  }
+  .powering .bead {
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------------------- tooltip */
+
+.bead__tip {
+  position: absolute;
+  top: calc(var(--node-hit) - 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  min-width: 180px;
+  max-width: 280px;
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  text-align: left;
+}
+
+.bead__tip-title {
+  font-size: var(--fs-small);
+  color: var(--text-hi);
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.bead__tip-meta {
+  margin-top: 5px;
+  font-size: var(--fs-caption);
+  color: var(--text-mid);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bead__tip-status {
+  color: var(--ring);
+  font-weight: 700;
+}
+
+/* -------------------------------------------------------------------- edge */
+
+.edge-core,
+.edge-glow {
+  fill: none;
+  stroke-linecap: round;
+}
+
+/*
+ * Two stacked paths and one shared <filter>. The underlay sits at opacity 0 and
+ * transitions to 0.6 — animating opacity on an already-composited layer is free,
+ * where a per-edge drop-shadow is a raster pass that tanks framerate past ~100
+ * edges (§6.2).
+ */
+.edge-glow {
+  opacity: 0;
+  transition: opacity var(--t-mid) ease-out;
+  filter: url(#neon-blur);
+  stroke-width: 6;
+}
+
+.edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.edge:hover .edge-glow,
+.edge--highlit .edge-glow {
+  opacity: 0.6;
+}
+
+.edge--blocks .edge-core { stroke-width: 2; }
+.edge--spent .edge-core { stroke-width: 1; stroke: var(--tube-off); }
+.edge--spent .edge-glow { display: none; }
+.edge--parent-child .edge-core {
+  stroke-width: 1.5;
+  stroke: var(--glow-violet);
+  stroke-opacity: 0.4;
+  stroke-dasharray: 6 5;
+}
+.edge--related .edge-core,
+.edge--discovered-from .edge-core {
+  stroke-width: 1;
+  stroke: var(--tube-off);
+  stroke-opacity: 0.3;
+  stroke-dasharray: 1 4;
+}
+
+.edge[data-emphasis='dimmed'] {
+  opacity: 0.15;
+}
+.edge {
+  transition: opacity var(--t-mid) var(--ease-out);
+}
+
+@keyframes edge-strike {
+  from { stroke-dashoffset: var(--dash-len, 400); opacity: 0; }
+  60% { opacity: 1; }
+  to { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.powering .edge--animatable .edge-core {
+  stroke-dasharray: var(--dash-len, 400);
+  animation: edge-strike 360ms var(--ease-out) both;
+  animation-delay: var(--power-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .powering .edge--animatable .edge-core {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}

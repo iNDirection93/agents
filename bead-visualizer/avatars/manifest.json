@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "_comment": "Replace these files with your own art. Keys match the agent labels beads carry; `hue` tints that agent's node ring so each agent reads as a distinct neon before you recognise the face.",
+  "fallback": "generic-agent.svg",
+  "agents": {
+    "willie": {
+      "file": "willie.svg",
+      "label": "Willie",
+      "hue": "#B47CFF"
+    },
+    "drnick": {
+      "file": "drnick.svg",
+      "label": "Drnick",
+      "hue": "#4FE8FF"
+    },
+    "flanders": {
+      "file": "flanders.svg",
+      "label": "Flanders",
+      "hue": "#7CFF4F"
+    },
+    "tod": {
+      "file": "tod.svg",
+      "label": "Tod",
+      "hue": "#FF2E88"
+    },
+    "bart": {
+      "file": "bart.svg",
+      "label": "Bart",
+      "hue": "#FF9E2C"
+    },
+    "frink": {
+      "file": "frink.svg",
+      "label": "Frink",
+      "hue": "#A79FC4"
+    },
+    "lisa": {
+      "file": "lisa.svg",
+      "label": "Lisa",
+      "hue": "#FFF4E8"
+    }
+  }
+}

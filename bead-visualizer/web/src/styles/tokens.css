@@ -1,0 +1,87 @@
+/*
+ * The palette IS the design system (§8). Every colour below encodes something:
+ * brightness is how live a bead is, and nothing glows decoratively.
+ */
+:root {
+  /* substrate */
+  --void: #0b0714;
+  --panel: #141026;
+  --panel-hi: #1e1838;
+  --tube-off: #3a3358;
+  --hairline: rgba(255, 255, 255, 0.07);
+
+  /* emission — sequential, cold backlog to hot active to cooled done */
+  --glow-lime: #7cff4f;
+  --glow-amber: #ff9e2c;
+  --glow-magenta: #ff2e88;
+  --glow-ice: #4fe8ff;
+  --glow-violet: #b47cff;
+  --hot-core: #fff4e8;
+
+  /* type */
+  --text-hi: #f0ebff;   /* ~15:1 on --void */
+  --text-mid: #a79fc4;  /* ~6:1 on --panel */
+  --text-lo: #6b6389;   /* decorative only — never body copy, never load-bearing */
+  /*
+   * The bead ID caption, and the ID column in the drawer's blocker lists, are the
+   * two places a "dim caption" is genuinely load-bearing: they are what makes the
+   * graph scannable and what you read before clicking. --text-lo is 3.58:1 on
+   * --void, under the text floor, so those get their own token — same violet cast,
+   * tuned to clear 4.5:1 on --void, --panel and --panel-hi alike.
+   */
+  --text-caption: #877fa3;
+
+  /* status → colour, resolved once so components never branch on status names */
+  --status-backlog: var(--tube-off);
+  --status-ready: var(--glow-lime);
+  --status-in_progress: var(--glow-amber);
+  --status-blocked: var(--glow-magenta);
+  --status-done: var(--glow-ice);
+  --status-gate: var(--glow-violet);
+
+  /* type scale: 11 / 13 / 15 / 20 / 32, body 15 minimum */
+  --fs-caption: 11px;
+  --fs-small: 13px;
+  --fs-body: 15px;
+  --fs-lg: 20px;
+  --fs-xl: 32px;
+
+  --font-display: 'Syncopate', 'Arial Black', 'Helvetica Neue', sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, monospace;
+
+  /* geometry */
+  --node-size: 64px;
+  --node-hit: 88px;
+  --radius: 3px;
+  --drawer-w: 380px;
+  --header-h: 64px;
+
+  /* motion — micro-transitions 150–300ms, ease-out entering (§7) */
+  --t-fast: 150ms;
+  --t-mid: 180ms;
+  --t-slow: 300ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* the two atmosphere effects, both nearly invisible (§4) */
+  --scanline-opacity: 0.025;
+}
+
+/*
+ * Reduced motion is a hard gate, not a slowdown. The in-progress flicker is
+ * exactly the effect that triggers people, so it is switched off at the source
+ * rather than shortened.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 1ms;
+    --t-mid: 1ms;
+    --t-slow: 1ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
